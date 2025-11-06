@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.CatSkinManager;
+import org.daylight.util.CompatabilityUtil;
 import org.daylight.util.PlayerToCatReplacer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class CatifyModClient implements ClientModInitializer {
         ConfigHandler.init();
         CatSkinManager.init();
         OwnResourceReloadListener.register();
+        CompatabilityUtil.init();
 
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {

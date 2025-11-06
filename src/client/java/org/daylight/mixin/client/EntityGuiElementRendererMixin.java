@@ -7,6 +7,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.EntityGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.EntityGuiElementRenderState;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -18,6 +20,7 @@ import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.RotationAxis;
 import org.daylight.IElementWVertexConsumerProvider;
 import org.daylight.IFeatureManager;
@@ -33,6 +36,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.regex.Pattern;
 
 @Mixin(EntityGuiElementRenderer.class)
 public class EntityGuiElementRendererMixin { // NEW
@@ -51,6 +56,8 @@ public class EntityGuiElementRendererMixin { // NEW
 //                            .build(true)
 //            );
 
+    private static final Pattern SKYBLOCK_WARDROBE_PATTERN = Pattern.compile("(?i)^wardrobe \\(\\d+/\\d+\\)$");
+
     @Inject(
             method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
             at = @At("HEAD"),
@@ -58,68 +65,78 @@ public class EntityGuiElementRendererMixin { // NEW
     )
     protected void render(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
         if(MinecraftClient.getInstance().player == null) return;
+//        System.out.println(state.getClass().getName());
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        if(screen instanceof GenericContainerScreen) {
+            Text title = screen.getTitle();
+            String text = title.getString();
+            if (SKYBLOCK_WARDROBE_PATTERN.matcher(text).matches()) {
+                return;
+            }
+        }
 
 //        System.out.println(state.renderState().getClass().getSimpleNa me());
 //        System.out.println(state instanceof IModifiableGuiElement);
 
-        if (ConfigHandler.replacementActive.getCached() && state.renderState().entityType == EntityType.PLAYER) {
-            if ((Object) this instanceof IElementWVertexConsumerProvider elementWVertexes
-                    && (Object) state instanceof IModifiableGuiElement modifiableGuiElement
-                    && (Object) state.renderState() instanceof PlayerEntityRenderState playerEntityRenderState) {
-                VertexConsumerProvider vertexConsumerProvider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        if (ConfigHandler.replacementActive.getCached())
+            if (state.renderState().entityType == EntityType.PLAYER) {
+                if ((Object) this instanceof IElementWVertexConsumerProvider elementWVertexes
+                        && (Object) state instanceof IModifiableGuiElement modifiableGuiElement
+                        && (Object) state.renderState() instanceof PlayerEntityRenderState playerEntityRenderState) {
+                    VertexConsumerProvider vertexConsumerProvider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 //                VertexConsumerProvider vertexConsumerProvider = elementWVertexes.getVertexConsumers();
 
-                MinecraftClient mc = MinecraftClient.getInstance();
-                EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
-                CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(mc.player);
+                    MinecraftClient mc = MinecraftClient.getInstance();
+                    EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
+                    CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(mc.player);
 
-                if(cat == null) return;
-                ci.cancel();
+                    if(cat == null) return;
+                    ci.cancel();
 
-                mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.PLAYER_SKIN);
+                    mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.PLAYER_SKIN);
 
-                LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel> renderer = (LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel>) dispatcher.getRenderer(cat);
-                CatEntityRenderState renderState = renderer.createRenderState();
-                renderer.updateRenderState(cat, renderState, 0); // mc.getRenderTickCounter().getTickProgress(true)
-                CatChargeFeatureRenderer.getChargeData(cat).chargeActive = false;
+                    LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel> renderer = (LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel>) dispatcher.getRenderer(cat);
+                    CatEntityRenderState renderState = renderer.createRenderState();
+                    renderer.updateRenderState(cat, renderState, 0); // mc.getRenderTickCounter().getTickProgress(true)
+                    CatChargeFeatureRenderer.getChargeData(cat).chargeActive = false;
 
-                renderState.relativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
-                renderState.bodyYaw = playerEntityRenderState.bodyYaw;
-                renderState.pitch = playerEntityRenderState.pitch;
+                    renderState.relativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
+                    renderState.bodyYaw = playerEntityRenderState.bodyYaw;
+                    renderState.pitch = playerEntityRenderState.pitch;
 
-                Vector3f translation = state.translation();
+                    Vector3f translation = state.translation();
 
-                if(ModStateUtils.shouldRenderCat(mc.player)) {
-                    try {
-                        matrices.push();
-                        matrices.translate(translation.x, translation.y, translation.z);
+                    if(ModStateUtils.shouldRenderCat(mc.player)) {
+                        try {
+                            matrices.push();
+                            matrices.translate(translation.x, translation.y, translation.z);
 //                matrices.scale(1.0F, 1.0F, -1.0F);
-                        matrices.multiply(state.rotation());
+                            matrices.multiply(state.rotation());
 
-                        Quaternionf overrideAngle = state.overrideCameraAngle();
-                        if (overrideAngle != null) {
-                            dispatcher.setRotation(overrideAngle.conjugate(new Quaternionf()).rotateY((float) Math.PI));
-                        }
+                            Quaternionf overrideAngle = state.overrideCameraAngle();
+                            if (overrideAngle != null) {
+                                dispatcher.setRotation(overrideAngle.conjugate(new Quaternionf()).rotateY((float) Math.PI));
+                            }
 
 //                    modifiableGuiElement.setRotation(quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI));
 
-                        PlayerToCatReplacer.syncSittingAndLimbs(mc.player, cat);
+                            PlayerToCatReplacer.syncSittingAndLimbs(mc.player, cat);
 
-                        if(ConfigHandler.catDamageVisible.getCached()) renderState.hurt = playerEntityRenderState.hurt;
-                        else renderState.hurt = false;
+                            if(ConfigHandler.catDamageVisible.getCached()) renderState.hurt = playerEntityRenderState.hurt;
+                            else renderState.hurt = false;
 
-                        dispatcher.setRenderShadows(false);
-                        renderer.render(renderState, matrices, vertexConsumerProvider, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-                        dispatcher.setRenderShadows(true);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    } finally {
-                        matrices.pop();
+                            dispatcher.setRenderShadows(false);
+                            renderer.render(renderState, matrices, vertexConsumerProvider, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+                            dispatcher.setRenderShadows(true);
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                        } finally {
+                            matrices.pop();
+                        }
                     }
-                }
 
-                // Charge, disabled because doesn't work at all
-                if(ModStateUtils.shouldRenderCharge(mc.player) && false && renderer instanceof IFeatureManager featureManager) {
+                    // Charge, disabled because doesn't work at all
+                    if(ModStateUtils.shouldRenderCharge(mc.player) && false && renderer instanceof IFeatureManager featureManager) {
                     /*try {
                         matrices.push();
 
@@ -164,10 +181,10 @@ public class EntityGuiElementRendererMixin { // NEW
                     }  finally {
                         matrices.pop();
                     }*/
-                }
+                    }
 
 //                CatEntityModel catModel = renderer.getModel();
+                }
             }
-        }
     }
 }

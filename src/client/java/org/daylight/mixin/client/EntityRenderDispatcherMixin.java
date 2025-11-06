@@ -17,6 +17,7 @@ import net.minecraft.world.WorldView;
 import org.daylight.*;
 import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
+import org.daylight.util.CompatabilityUtil;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Final;
@@ -49,8 +50,9 @@ public abstract class EntityRenderDispatcherMixin {
             int light,
             CallbackInfo ci
     ) {
-        if (ConfigHandler.replacementActive.getCached() && entity instanceof AbstractClientPlayerEntity player &&
-                PlayerToCatReplacer.shouldReplace(player)) {
+        if (ConfigHandler.replacementActive.getCached() && entity instanceof AbstractClientPlayerEntity player
+                && PlayerToCatReplacer.shouldReplace(player)
+                && !CompatabilityUtil.playerClassExcluded(player)) {
             CatEntity existingCat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);
             EntityRenderer<CatEntity, EntityRenderState> catRenderer = null;
             EntityRenderer<PlayerEntity, PlayerEntityRenderState> playerRenderer = null;
