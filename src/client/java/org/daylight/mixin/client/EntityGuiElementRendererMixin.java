@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.EntityGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.EntityGuiElementRenderState;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderManager;
@@ -29,6 +30,7 @@ import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -78,6 +80,7 @@ public class EntityGuiElementRendererMixin { // NEW
                 StateStorage.inventoryRelativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
                 StateStorage.inventoryBodyYaw = playerEntityRenderState.bodyYaw;
                 StateStorage.inventoryPitch = playerEntityRenderState.pitch;
+                StateStorage.currentlyRenderingUi = true;
 
                 if(cat == null) return;
 //                ci.cancel(); // TODO
@@ -177,6 +180,14 @@ public class EntityGuiElementRendererMixin { // NEW
 //                CatEntityModel catModel = renderer.getModel();
             }
         }
+    }
+
+    @Inject(
+            method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            at = @At("TAIL")
+    )
+    protected void renderEnd(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
+        StateStorage.currentlyRenderingUi = false;
     }
 
     @Inject(

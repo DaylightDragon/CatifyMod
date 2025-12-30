@@ -1,6 +1,7 @@
 package org.daylight.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -25,6 +26,7 @@ import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -207,6 +209,10 @@ public abstract class EntityRenderManagerMixin {
     )
     private <S extends EntityRenderState> void render(S renderState, CameraRenderState cameraRenderState, double x, double y, double z, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) throws IllegalAccessException {
         if(!ConfigHandler.replacementActive.getCached()) return;
+
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        if(StateStorage.currentlyRenderingUi && screen != null && !WhitelistedScreensUtil.isWhitelisted(screen)) return;
+
         if(renderState instanceof PlayerEntityRenderState playerState) {
             if(StateStorage.currentStates.containsKey(playerState)) {
                 UUID playerUuid = StateStorage.currentStates.get(playerState);
