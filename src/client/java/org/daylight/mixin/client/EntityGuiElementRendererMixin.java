@@ -30,6 +30,7 @@ import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -67,6 +68,8 @@ public class EntityGuiElementRendererMixin { // NEW
         if(MinecraftClient.getInstance().player == null) return;
 //        System.out.println(state.getClass().getName());
         Screen screen = MinecraftClient.getInstance().currentScreen;
+        if(screen == null || !WhitelistedScreensUtil.isWhitelisted(screen)) return;
+
         if(screen instanceof GenericContainerScreen) {
             Text title = screen.getTitle();
             String text = title.getString();
