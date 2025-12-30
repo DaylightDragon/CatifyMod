@@ -12,30 +12,24 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin {
-    @ModifyVariable(
-            method = "Lnet/minecraft/client/gui/screen/ingame/InventoryScreen;drawEntity(Lnet/minecraft/client/gui/DrawContext;IIIIFLorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;Lnet/minecraft/entity/LivingEntity;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/DrawContext;addEntity(Lnet/minecraft/client/render/entity/state/EntityRenderState;FLorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;IIII)V",
-                    shift = At.Shift.AFTER
-            ),
-            ordinal = 0
+    @Inject(
+            method = "drawEntity(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/client/render/entity/state/EntityRenderState;",
+            at = @At("RETURN")
     )
-    private static EntityRenderState captureState(EntityRenderState state, DrawContext drawer,
-                                                  int x1, int y1, int x2, int y2,
-                                                  float scale, Vector3f translation,
-                                                  Quaternionf rotation,
-                                                  @Nullable Quaternionf overrideCameraAngle,
-                                                  LivingEntity entity
+    private static void captureState(
+            LivingEntity entity,
+            CallbackInfoReturnable<EntityRenderState> cir
     ) {
-        if(state instanceof PlayerEntityRenderState) {
-//            System.out.println("Adding from InventoryScreen " + state);
+        EntityRenderState state = cir.getReturnValue();
+
+        if (state instanceof PlayerEntityRenderState) {
             StateStorage.currentStates.put(state, entity.getUuid());
         }
-        return state;
     }
 }
