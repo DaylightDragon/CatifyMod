@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.WorldView;
 import org.daylight.*;
@@ -19,6 +20,7 @@ import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +30,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
+    @Shadow
+    private Quaternionf rotation;
+
+    @Shadow
+    protected abstract void renderFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, Quaternionf rotation);
+
     @Shadow
     private boolean renderShadows;
     @Shadow
@@ -86,6 +94,12 @@ public abstract class EntityRenderDispatcherMixin {
                     if(ModStateUtils.shouldRenderCat(player)) {
                         // Just cat
                         catRenderer.render(catState, matrices, vertexConsumers, light);
+                    }
+
+                    // Fire
+                    if (playerState.onFire) {
+                        playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
+                        renderFire(matrices, vertexConsumers, playerState, MathHelper.rotateAround(MathHelper.Y_AXIS, this.rotation, new Quaternionf()));
                     }
                 } catch (ClassCastException e) {
                     CatifyModClient.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);

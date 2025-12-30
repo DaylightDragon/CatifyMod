@@ -19,6 +19,7 @@ import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.daylight.IElementWVertexConsumerProvider;
 import org.daylight.IFeatureManager;
@@ -31,7 +32,9 @@ import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.WhitelistedScreensUtil;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -52,6 +55,10 @@ public class EntityGuiElementRendererMixin { // NEW
 ////                            .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
 //                            .build(true)
 //            );
+
+    @Shadow
+    @Final
+    private EntityRenderDispatcher entityRenderDispatcher;
 
     @Inject(
             method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
@@ -116,6 +123,14 @@ public class EntityGuiElementRendererMixin { // NEW
                         dispatcher.setRenderShadows(false);
                         renderer.render(renderState, matrices, vertexConsumerProvider, LightmapTextureManager.MAX_LIGHT_COORDINATE);
                         dispatcher.setRenderShadows(true);
+
+                        // Fire
+                        if (state.renderState().onFire) {
+                            if(entityRenderDispatcher instanceof EntityRenderDispatcherAccessor entityRenderDispatcherAccessor &&
+                            this instanceof SpecialGuiElementRendererAccessor specialGuiElementRendererAccessor) {
+                                entityRenderDispatcherAccessor.callRenderFire(matrices, specialGuiElementRendererAccessor.getVertexConsumers(), state.renderState(), MathHelper.rotateAround(MathHelper.Y_AXIS, entityRenderDispatcherAccessor.getRotation(), new Quaternionf()));
+                            }
+                        }
                     } catch (Throwable t) {
                         t.printStackTrace();
                     } finally {

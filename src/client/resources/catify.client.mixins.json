@@ -9,13 +9,15 @@
     "CatEntityRenderStateMixin",
     "EntityGuiElementRendererMixin",
     "EntityGuiElementRenderStateMixin",
+    "EntityRenderDispatcherAccessor",
     "EntityRenderDispatcherMixin",
     "EntityRendererAccessor",
     "EntityRendererMixin",
     "LimbAnimatorAccessor",
     "LivingEntityRendererMixin",
     "PlayerEntityRendererMixin",
-    "SpecialGuiElementRendererAccessor"
+    "SpecialGuiElementRendererAccessor",
+    "SpecialGuiElementRendererAccessorLegacy"
   ],
   "verbose": false,
   "injectors": {
