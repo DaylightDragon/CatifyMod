@@ -4,18 +4,25 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import org.daylight.config.ConfigHandler;
+import org.daylight.replacements.FabricSetConfigValue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class WhitelistedScreensUtil {
+    private static final Set<Class<?>> whitelistedScreens = new HashSet<>();
+
     public static void initDefaultWhitelistedScreens() {
-        ConfigHandler.whitelistedScreens.set(new ArrayList<>());
-        ConfigHandler.whitelistedScreens.get().add(InventoryScreen.class);
-        ConfigHandler.whitelistedScreens.get().add(CreativeInventoryScreen.class);
+        ConfigHandler.whitelistedScreenNames.set(new ArrayList<>());
+        whitelistedScreens.clear();
+
+        whitelistedScreens.add(InventoryScreen.class);
+        whitelistedScreens.add(CreativeInventoryScreen.class);
 
         Optional<Class<? extends Screen>> screen = findScreenClass("de.hysky.skyblocker.skyblock.item.SkyblockInventoryScreen");
-        screen.ifPresent(aClass -> ConfigHandler.whitelistedScreens.get().add(aClass));
+        screen.ifPresent(whitelistedScreens::add);
     }
 
     public static Optional<Class<? extends Screen>> findScreenClass(String name) {
@@ -29,17 +36,38 @@ public class WhitelistedScreensUtil {
     }
 
     public static void whitelistScreen(Screen screen) {
-        ConfigHandler.whitelistedScreens.get().add(screen.getClass());
+        if(whitelistedScreens.contains(screen.getClass())) return;
+        whitelistedScreens.add(screen.getClass());
+
+        serializeClassNames();
         ConfigHandler.CONFIG.save();
     }
 
     public static void unwhitelistScreen(Screen screen) {
-        ConfigHandler.whitelistedScreens.get().remove(screen.getClass());
+        if(!whitelistedScreens.contains(screen.getClass())) return;
+        whitelistedScreens.remove(screen.getClass());
+
+        serializeClassNames();
         ConfigHandler.CONFIG.save();
     }
 
     public static boolean isWhitelisted(Screen screen) {
-        return ConfigHandler.whitelistedScreens.getCached().contains(screen.getClass());
+        return whitelistedScreens.contains(screen.getClass());
+    }
+
+    public static void deserializeClassNames() {
+        whitelistedScreens.clear();
+        ConfigHandler.whitelistedScreenNames.get().forEach(name -> {
+            Optional<Class<? extends Screen>> screen = findScreenClass(name);
+            screen.ifPresent(whitelistedScreens::add);
+        });
+    }
+
+    public static void serializeClassNames() {
+        ConfigHandler.whitelistedScreenNames.get().clear();
+        whitelistedScreens.forEach(screen -> {
+            ConfigHandler.whitelistedScreenNames.getCached().add(screen.getName());
+        });
     }
 
     public static void toggleScreen(Screen screen) {

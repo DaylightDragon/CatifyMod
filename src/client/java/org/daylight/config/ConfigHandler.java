@@ -20,7 +20,7 @@ public class ConfigHandler {
     public static IBooleanConfigValue catDamageVisible;
     public static IBooleanConfigValue catHandActive;
     public static IEnumConfigValue invisibilityBehaviour;
-    public static IListConfigValue<Class<?>> whitelistedScreens;
+    public static IListConfigValue<String> whitelistedScreenNames;
 
     public static void init() {
         CONFIG.load();
@@ -31,8 +31,9 @@ public class ConfigHandler {
         catHandActive = new FabricBooleanConfigValue(CONFIG, "catHandActive", true);
         catDamageVisible = new FabricBooleanConfigValue(CONFIG, "catDamageVisible", true);
         invisibilityBehaviour = new FabricEnumConfigValue(CONFIG, "invisibilityBehaviour", InvisibilityBehaviour.VANILLA);
-        whitelistedScreens = new FabricListConfigValue<>(CONFIG, "whitelistedAffectedScreens", null);
+        whitelistedScreenNames = new FabricListConfigValue<>(CONFIG, "whitelistedAffectedScreens", null);
 
-        if(whitelistedScreens.get() == null) WhitelistedScreensUtil.initDefaultWhitelistedScreens();
+        if(whitelistedScreenNames.get() == null) WhitelistedScreensUtil.initDefaultWhitelistedScreens();
+        else WhitelistedScreensUtil.deserializeClassNames();
     }
 }
