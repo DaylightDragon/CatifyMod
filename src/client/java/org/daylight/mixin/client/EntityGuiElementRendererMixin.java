@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.EntityGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.EntityGuiElementRenderState;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -27,6 +28,7 @@ import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -58,6 +60,9 @@ public class EntityGuiElementRendererMixin { // NEW
     )
     protected void render(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
         if(MinecraftClient.getInstance().player == null) return;
+
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        if(screen == null || !WhitelistedScreensUtil.isWhitelisted(screen)) return;
 
 //        System.out.println(state.renderState().getClass().getSimpleNa me());
 //        System.out.println(state instanceof IModifiableGuiElement);

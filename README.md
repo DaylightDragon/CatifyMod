@@ -68,7 +68,8 @@ There should be no chance a server anticheat can notice a difference, so it's co
 
 ## Versions
 Fabric:  
-- 1.21.2 - 1.21.8  
+- 1.21.2 - 1.21.10  
+This repository branch version is for 1.21.6 - 1.21.8
 
 Version Differences:
 1. Versions from range 1.21.2 - 1.21.4 are way less tested than usual  

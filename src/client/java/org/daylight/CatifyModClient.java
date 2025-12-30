@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Environment(EnvType.CLIENT)
 public class CatifyModClient implements ClientModInitializer {
-	public static final String MOD_ID = "catmodel";
+	public static final String MOD_ID = "catify";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final MinecraftClient client = MinecraftClient.getInstance();
     AtomicBoolean checked = new AtomicBoolean(false);
@@ -28,6 +28,7 @@ public class CatifyModClient implements ClientModInitializer {
 	public void onInitializeClient() {
         ModCommands.register();
         ModResources.init();
+        ModKeyBindings.register();
         ConfigHandler.init();
         CatSkinManager.init();
         OwnResourceReloadListener.register();
