@@ -28,6 +28,7 @@ public class CatifyModClient implements ClientModInitializer {
 	public void onInitializeClient() {
         ModCommands.register();
         ModResources.init();
+        ModKeyBindings.register();
         ConfigHandler.init();
         CatSkinManager.init();
         OwnResourceReloadListener.register();

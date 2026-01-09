@@ -176,7 +176,7 @@ public class ModCommands {
                                 if(stateStr.equalsIgnoreCase("never")) {
                                     behaviour = InvisibilityBehaviour.NEVER;
                                 } else if(stateStr.equals("vanilla")) {
-                                    behaviour = InvisibilityBehaviour.USUAL;
+                                    behaviour = InvisibilityBehaviour.VANILLA;
                                 } else if(stateStr.equals("charged")) {
                                     behaviour = InvisibilityBehaviour.CHARGED;
                                 } else {

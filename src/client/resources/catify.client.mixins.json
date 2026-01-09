@@ -10,9 +10,11 @@
     "EntityRenderDispatcherMixin",
     "EntityRendererAccessor",
     "EntityRendererMixin",
+    "GameRendererMixin",
     "LimbAnimatorAccessor",
     "LivingEntityRendererMixin",
-    "PlayerEntityRendererMixin"
+    "PlayerEntityRendererMixin",
+    "ScreenMixin"
   ],
   "verbose": false,
   "injectors": {
