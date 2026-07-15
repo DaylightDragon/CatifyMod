@@ -1,14 +1,14 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.feline.CatVariant;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(CatEntity.class)
+@Mixin(Cat.class)
 public interface CatEntityAccessor {
     @Invoker("setVariant")
-    void invokeSetVariant(RegistryEntry<CatVariant> variant);
+    void invokeSetVariant(Holder<CatVariant> variant);
 }
 

@@ -2,24 +2,22 @@ package org.daylight.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.feline.CatVariant;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.daylight.CatifyModClient;
 import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
@@ -28,7 +26,7 @@ import org.daylight.mixin.client.CatEntityAccessor;
 import org.daylight.mixin.client.LimbAnimatorAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -39,54 +37,54 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class PlayerToCatReplacer {
     public static final Logger LOGGER = LoggerFactory.getLogger(CatifyModClient.MOD_ID);
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Minecraft client = Minecraft.getInstance();
     private static final Map<UUID, LivingEntity> dummyModelMap = new HashMap<>();
-    private static World targetWorld;
+    private static Level targetWorld;
 
     public static void initWorld() {
-        if (client == null || client.world == null) return;
-        targetWorld = client.world;
+        if (client == null || client.level == null) return;
+        targetWorld = client.level;
 
 //        CatVariants.ALL_BLACK.getValue().getPath()
     }
 
-    public static void replaceWithCat(AbstractClientPlayerEntity player) {
-        if (dummyModelMap.containsKey(player.getUuid())) return;
+    public static void replaceWithCat(AbstractClientPlayer player) {
+        if (dummyModelMap.containsKey(player.getUUID())) return;
 
-        CatEntity cat = new CatEntity(EntityType.CAT, targetWorld);
+        Cat cat = new Cat(EntityType.CAT, targetWorld);
         if(ConfigHandler.catVariantVanilla.get()) changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
-        cat.setTamed(false, false);
+        cat.setTame(false, false);
 //        cat.setOwner(player);
 
         cat.setNoGravity(true);
-        cat.noClip = true;
-        cat.setAiDisabled(true);
-        cat.setPosition(player.getX(), player.getY(), player.getZ());
+        cat.noPhysics = true;
+        cat.setNoAi(true);
+        cat.setPos(player.getX(), player.getY(), player.getZ());
 
-        dummyModelMap.put(player.getUuid(), cat);
+        dummyModelMap.put(player.getUUID(), cat);
 
         CatSkinManager.setupCustomSkin();
     }
 
-    private static RegistryEntry<CatVariant> getCatVariant(RegistryKey<CatVariant> variantKey) {
-        if(client.world == null) {
+    private static Holder<CatVariant> getCatVariant(ResourceKey<CatVariant> variantKey) {
+        if(client.level == null) {
             LOGGER.warn("Client world is null");
             return null;
         }
 
-        return client.world.getRegistryManager()
-                .getOrThrow(RegistryKeys.CAT_VARIANT)
-                .getEntry(variantKey.getValue())
+        return client.level.registryAccess()
+                .lookupOrThrow(Registries.CAT_VARIANT)
+                .get(variantKey.identifier())
                 .orElseThrow(() -> new IllegalStateException("Cat variant not found: " + variantKey));
     }
 
-    public static void changeCatVariant(CatEntity cat, RegistryKey<CatVariant> variantKey) {
-        RegistryEntry<CatVariant> variant = getCatVariant(variantKey);
+    public static void changeCatVariant(Cat cat, ResourceKey<CatVariant> variantKey) {
+        Holder<CatVariant> variant = getCatVariant(variantKey);
         ((CatEntityAccessor) cat).invokeSetVariant(variant);
     }
 
     private static float lerpAngle(float current, float target, float factor) {
-        float delta = MathHelper.wrapDegrees(target - current);
+        float delta = Mth.wrapDegrees(target - current);
         return current + delta * factor;
     }
 
@@ -95,16 +93,16 @@ public class PlayerToCatReplacer {
         dummyModelMap.clear();
     }
 
-    public static boolean shouldReplace(PlayerEntity player) {
-        return dummyModelMap.containsKey(player.getUuid()) &&
-                player == MinecraftClient.getInstance().player;
+    public static boolean shouldReplace(Player player) {
+        return dummyModelMap.containsKey(player.getUUID()) &&
+                player == Minecraft.getInstance().player;
     }
 
-    public static PlayerEntity getPlayerById(UUID uuid) {
-        ClientWorld world = MinecraftClient.getInstance().world;
+    public static Player getPlayerById(UUID uuid) {
+        ClientLevel world = Minecraft.getInstance().level;
 
         if (world != null) {
-            PlayerEntity player = world.getPlayerByUuid(uuid);
+            Player player = world.getPlayerByUUID(uuid);
             if (player != null) {
                 return player;
             }
@@ -112,62 +110,62 @@ public class PlayerToCatReplacer {
         return null;
     }
 
-    public static LivingEntity getCatForPlayer(PlayerEntity player) {
-        return dummyModelMap.get(player.getUuid());
+    public static LivingEntity getCatForPlayer(Player player) {
+        return dummyModelMap.get(player.getUUID());
     }
 
-    public static boolean isDummyCat(CatEntity catEntity) {
+    public static boolean isDummyCat(Cat catEntity) {
         return dummyModelMap.containsValue(catEntity); // && player == MinecraftClient.getInstance().player;
     }
 
-    public static void syncEntity2(PlayerEntity player, CatEntity existingCat) {
-        existingCat.lastX = player.lastX;
-        existingCat.lastY = player.lastY;
-        existingCat.lastZ = player.lastZ;
-        existingCat.setPos(player.getX(), player.getY(), player.getZ());
+    public static void syncEntity2(Player player, Cat existingCat) {
+        existingCat.xo = player.xo;
+        existingCat.yo = player.yo;
+        existingCat.zo = player.zo;
+        existingCat.setPosRaw(player.getX(), player.getY(), player.getZ());
 
-        existingCat.lastYaw = player.lastYaw;
-        existingCat.setYaw(player.getYaw());
+        existingCat.yRotO = player.yRotO;
+        existingCat.setYRot(player.getYRot());
 
-        existingCat.lastPitch = player.lastPitch;
-        existingCat.setPitch(player.getPitch());
+        existingCat.xRotO = player.xRotO;
+        existingCat.setXRot(player.getXRot());
 
-        existingCat.lastBodyYaw = player.lastBodyYaw;
-        existingCat.bodyYaw = player.bodyYaw;
+        existingCat.yBodyRotO = player.yBodyRotO;
+        existingCat.yBodyRot = player.yBodyRot;
 
-        existingCat.lastHeadYaw = player.lastHeadYaw;
-        existingCat.headYaw = player.headYaw;
+        existingCat.yHeadRotO = player.yHeadRotO;
+        existingCat.yHeadRot = player.yHeadRot;
 
         syncSittingAndLimbs(player, existingCat);
     }
 
-    public static void syncSittingAndLimbs(PlayerEntity player, CatEntity existingCat) {
+    public static void syncSittingAndLimbs(Player player, Cat existingCat) {
         // Sitting
-        double dx = player.getX() - player.lastX;
-        double dz = player.getZ() - player.lastZ;
+        double dx = player.getX() - player.xo;
+        double dz = player.getZ() - player.zo;
         double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
 
-        boolean sneaking = player.isSneaking(); // or isInSneakingPose()
+        boolean sneaking = player.isShiftKeyDown(); // or isInSneakingPose()
         boolean slowEnough = horizontalSpeed < 0.01;
 
         boolean sitting = sneaking && slowEnough;
         existingCat.setInSittingPose(sitting);
 
-        existingCat.limbAnimator.updateLimbs(
+        existingCat.walkAnimation.update(
                 getPlayerMovementSpeed(player),
                 0.9f,
                 1.0f
         );
 
-        if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
-            acc.setAnimationProgress(player.limbAnimator.getAnimationProgress());
+        if (existingCat.walkAnimation instanceof LimbAnimatorAccessor acc) {
+            acc.setAnimationProgress(player.walkAnimation.position());
         }
     }
 
-    private static float getPlayerMovementSpeed(PlayerEntity player) {
+    private static float getPlayerMovementSpeed(Player player) {
         // Вычисляем скорость движения игрока
-        double dx = player.getX() - player.lastX;
-        double dz = player.getZ() - player.lastZ;
+        double dx = player.getX() - player.xo;
+        double dz = player.getZ() - player.zo;
         double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
 
         // Нормализуем скорость для анимаций
@@ -179,9 +177,9 @@ public class PlayerToCatReplacer {
         return Math.min(speed, 1.0f);
     }
 
-    public static void setLocalCatVariant(RegistryKey<CatVariant> variant) {
+    public static void setLocalCatVariant(ResourceKey<CatVariant> variant) {
         LivingEntity catLivingEntity = getCatForPlayer(client.player);
-        if(catLivingEntity instanceof CatEntity catEntity) {
+        if(catLivingEntity instanceof Cat catEntity) {
             changeCatVariant(catEntity, variant);
             if(catEntity instanceof CustomCatTextureHolder customCatTextureHolder) {
                 customCatTextureHolder.catModel$setCustomTexture(null);
@@ -190,7 +188,7 @@ public class PlayerToCatReplacer {
         }
     }
 
-    public static Identifier getCustomCatTexture(PlayerEntity player) {
+    public static Identifier getCustomCatTexture(Player player) {
         LivingEntity cat = getCatForPlayer(player);
         if(cat instanceof CustomCatTextureHolder customCatTextureHolder) {
             return customCatTextureHolder.catModel$getCustomTexture();
@@ -198,9 +196,9 @@ public class PlayerToCatReplacer {
         return null;
     }
 
-    public static boolean setCustomCatEntityTexture(PlayerEntity player, String skinName) {
+    public static boolean setCustomCatEntityTexture(Player player, String skinName) {
         LivingEntity cat = getCatForPlayer(player);
-        if(cat instanceof CatEntity catEntity) {
+        if(cat instanceof Cat catEntity) {
             Identifier identifier = loadCustomTexture("cat_enitity_skins", skinName);
             if(!GraphicsUtils.doesTextureExist(identifier)) return false;
             if(catEntity instanceof CustomCatTextureHolder customCatTextureHolder) {
@@ -225,7 +223,7 @@ public class PlayerToCatReplacer {
 
     public static Identifier loadCustomTexture(String subfolder, String skinName) {
         try {
-            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/catify/" + subfolder;
+            String basePath = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/data/catify/" + subfolder;
             File folder = new File(basePath);
             folder.mkdirs();
 //            System.out.println(Arrays.toString(folder.listFiles()));
@@ -236,10 +234,10 @@ public class PlayerToCatReplacer {
 
             NativeImage image = NativeImage.read(new FileInputStream(file));
             Supplier<String> nameSupplier = () -> subfolder + "/" + skinName;
-            NativeImageBackedTexture texture = new NativeImageBackedTexture(nameSupplier, image);
+            DynamicTexture texture = new DynamicTexture(nameSupplier, image);
 
-            Identifier id = Identifier.of("catmodel", nameSupplier.get());
-            MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
+            Identifier id = Identifier.fromNamespaceAndPath("catmodel", nameSupplier.get());
+            Minecraft.getInstance().getTextureManager().register(id, texture);
             return id;
         } catch (Exception e) {
             e.printStackTrace();
@@ -249,7 +247,7 @@ public class PlayerToCatReplacer {
 
     public static Entity findAsCat(UUID entityId) {
         return dummyModelMap.values().stream()
-                .filter(entity -> entityId.equals(entity.getUuid()))
+                .filter(entity -> entityId.equals(entity.getUUID()))
                 .findFirst()
                 .orElse(null);
     }

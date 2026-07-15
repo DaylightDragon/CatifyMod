@@ -6,7 +6,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.CatSkinManager;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CatifyModClient implements ClientModInitializer {
 	public static final String MOD_ID = "catify";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	private static final MinecraftClient client = MinecraftClient.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
     AtomicBoolean checked = new AtomicBoolean(false);
 
 	@Override

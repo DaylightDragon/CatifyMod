@@ -3,24 +3,19 @@ package org.daylight.mixin.client;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.render.EntityGuiElementRenderer;
-import net.minecraft.client.gui.render.state.special.EntityGuiElementRenderState;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.CatEntityModel;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
-import net.minecraft.client.render.entity.state.CatEntityRenderState;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
+import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
+import net.minecraft.client.model.animal.feline.CatModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.CatRenderState;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.feline.Cat;
 import org.daylight.IElementWVertexConsumerProvider;
 import org.daylight.IFeatureManager;
 import org.daylight.IModifiableGuiElement;
@@ -38,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityGuiElementRenderer.class)
+@Mixin(GuiEntityRenderer.class)
 public class EntityGuiElementRendererMixin { // NEW
 //    private static final RenderLayer GUI_ENERGY =
 //            RenderLayer.of(
@@ -56,12 +51,12 @@ public class EntityGuiElementRendererMixin { // NEW
 //            );
 
     @Inject(
-            method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            method = "renderToTexture(Lnet/minecraft/client/gui/render/state/pip/GuiEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
             at = @At("HEAD"),
             cancellable = true
     )
-    protected void render(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
-        if(MinecraftClient.getInstance().player == null) return;
+    protected void render(GuiEntityRenderState state, PoseStack matrices, CallbackInfo ci) {
+        if(Minecraft.getInstance().player == null) return;
 
 //        System.out.println(state.renderState().getClass().getSimpleNa me());
 //        System.out.println(state instanceof IModifiableGuiElement);
@@ -69,17 +64,17 @@ public class EntityGuiElementRendererMixin { // NEW
         if (ConfigHandler.replacementActive.getCached() && state.renderState().entityType == EntityType.PLAYER) {
             if ((Object) this instanceof IElementWVertexConsumerProvider elementWVertexes
                     && (Object) state instanceof IModifiableGuiElement modifiableGuiElement
-                    && (Object) state.renderState() instanceof PlayerEntityRenderState playerEntityRenderState) {
-                VertexConsumerProvider vertexConsumerProvider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+                    && (Object) state.renderState() instanceof AvatarRenderState playerEntityRenderState) {
+                MultiBufferSource vertexConsumerProvider = Minecraft.getInstance().renderBuffers().bufferSource();
 //                VertexConsumerProvider vertexConsumerProvider = elementWVertexes.getVertexConsumers();
 
-                MinecraftClient mc = MinecraftClient.getInstance();
-                EntityRenderManager dispatcher = mc.getEntityRenderDispatcher();
-                CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(mc.player);
+                Minecraft mc = Minecraft.getInstance();
+                EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
+                Cat cat = (Cat) PlayerToCatReplacer.getCatForPlayer(mc.player);
 
-                StateStorage.inventoryRelativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
-                StateStorage.inventoryBodyYaw = playerEntityRenderState.bodyYaw;
-                StateStorage.inventoryPitch = playerEntityRenderState.pitch;
+                StateStorage.inventoryRelativeHeadYaw = playerEntityRenderState.yRot;
+                StateStorage.inventoryBodyYaw = playerEntityRenderState.bodyRot;
+                StateStorage.inventoryPitch = playerEntityRenderState.xRot;
                 StateStorage.currentlyRenderingUi = true;
 
                 if(cat == null) return;
@@ -88,14 +83,14 @@ public class EntityGuiElementRendererMixin { // NEW
 
 //                mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.PLAYER_SKIN);
 
-                LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel> renderer = (LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel>) dispatcher.getRenderer(cat);
-                CatEntityRenderState renderState = (CatEntityRenderState) renderer.getAndUpdateRenderState(cat, MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(true)); // renderer.createRenderState();
-                renderer.updateRenderState(cat, renderState, 0); // mc.getRenderTickCounter().getTickProgress(true)
+                LivingEntityRenderer<Cat, CatRenderState, CatModel> renderer = (LivingEntityRenderer<Cat, CatRenderState, CatModel>) dispatcher.getRenderer(cat);
+                CatRenderState renderState = (CatRenderState) renderer.createRenderState(cat, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)); // renderer.createRenderState();
+                renderer.extractRenderState(cat, renderState, 0); // mc.getRenderTickCounter().getTickProgress(true)
                 CatChargeFeatureRenderer.getChargeData(cat).chargeActive = false;
 
-                renderState.relativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
-                renderState.bodyYaw = playerEntityRenderState.bodyYaw;
-                renderState.pitch = playerEntityRenderState.pitch;
+                renderState.yRot = playerEntityRenderState.yRot;
+                renderState.bodyRot = playerEntityRenderState.bodyRot;
+                renderState.xRot = playerEntityRenderState.xRot;
 
                 Vector3f translation = state.translation();
 
@@ -183,18 +178,18 @@ public class EntityGuiElementRendererMixin { // NEW
     }
 
     @Inject(
-            method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            method = "renderToTexture(Lnet/minecraft/client/gui/render/state/pip/GuiEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
             at = @At("TAIL")
     )
-    protected void renderEnd(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
+    protected void renderEnd(GuiEntityRenderState state, PoseStack matrices, CallbackInfo ci) {
         StateStorage.currentlyRenderingUi = false;
     }
 
     @Inject(
-            method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            method = "renderToTexture(Lnet/minecraft/client/gui/render/state/pip/GuiEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
             at = @At("TAIL")
     )
-    protected void afterRender(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
+    protected void afterRender(GuiEntityRenderState state, PoseStack matrices, CallbackInfo ci) {
         StateStorage.inventoryRelativeHeadYaw = null;
         StateStorage.inventoryBodyYaw = null;
         StateStorage.inventoryPitch = null;

@@ -1,11 +1,9 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.LivingEntity;
 import org.daylight.util.StateStorage;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -19,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin {
     @Inject(
-            method = "drawEntity(Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/client/render/entity/state/EntityRenderState;",
+            method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;",
             at = @At("RETURN")
     )
     private static void captureState(
@@ -28,8 +26,8 @@ public class InventoryScreenMixin {
     ) {
         EntityRenderState state = cir.getReturnValue();
 
-        if (state instanceof PlayerEntityRenderState) {
-            StateStorage.currentStates.put(state, entity.getUuid());
+        if (state instanceof AvatarRenderState) {
+            StateStorage.currentStates.put(state, entity.getUUID());
         }
     }
 }

@@ -1,19 +1,5 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
-import net.minecraft.client.render.state.WorldRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.tick.TickManager;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.StateStorage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,28 +8,34 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Iterator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.LevelRenderState;
 
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public class WorldRendererMixin {
     @Inject(
-            method = "pushEntityRenders",
+            method = "submitEntities",
             at = @At("HEAD")
     )
     private void pushEntityRenders(CallbackInfo ci) {
-        if(!MinecraftClient.getInstance().isPaused()) {
-            CatChargeFeatureRenderer.moveGlobalTextureForward(MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(true));
+        if(!Minecraft.getInstance().isPaused()) {
+            CatChargeFeatureRenderer.moveGlobalTextureForward(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true));
         }
     }
 
     @Inject(
-            method = "pushEntityRenders",
+            method = "submitEntities",
             at = @At("TAIL")
     )
-    private void pushEntityRenders(MatrixStack matrices, WorldRenderState renderStates, OrderedRenderCommandQueue queue, CallbackInfo ci) {
+    private void pushEntityRenders(PoseStack matrices, LevelRenderState renderStates, SubmitNodeCollector queue, CallbackInfo ci) {
         for (EntityRenderState entityRenderState : renderStates.entityRenderStates) {
-            if(entityRenderState instanceof PlayerEntityRenderState) {
+            if(entityRenderState instanceof AvatarRenderState) {
 //                System.out.println("Removing from WorldRenderer: " + entityRenderState);
                 StateStorage.currentStates.remove(entityRenderState);
             }
