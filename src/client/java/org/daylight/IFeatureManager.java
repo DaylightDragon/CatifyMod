@@ -1,9 +1,6 @@
 package org.daylight;
 
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import org.daylight.features.CatChargeFeatureRenderer;
 
 import java.util.function.Predicate;

@@ -1,12 +1,15 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
+//import net.minecraft.client.render.VertexConsumerProvider;
+//import net.minecraft.client.render.entity.LivingEntityRenderer;
+//import net.minecraft.client.render.entity.feature.FeatureRenderer;
+//import net.minecraft.client.render.entity.model.EntityModel;
+//import net.minecraft.client.render.entity.state.LivingEntityRenderState;
+//import net.minecraft.client.util.math.MatrixStack;
+//import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.world.entity.LivingEntity;
 import org.daylight.IFeatureManager;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.spongepowered.asm.mixin.Final;
