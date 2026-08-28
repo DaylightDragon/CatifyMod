@@ -4,9 +4,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
+import net.minecraft.client.Minecraft;
 import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.CatSkinManager;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CatifyModClient implements ClientModInitializer {
 	public static final String MOD_ID = "catify";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	private static final MinecraftClient client = MinecraftClient.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
     AtomicBoolean checked = new AtomicBoolean(false);
 
 	@Override
@@ -32,7 +32,7 @@ public class CatifyModClient implements ClientModInitializer {
         CatSkinManager.init();
         OwnResourceReloadListener.register();
 
-		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
+        ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((handler, world) -> {
 			if (world != null) {
                 PlayerToCatReplacer.initWorld();
                 checked.set(false);
@@ -58,7 +58,7 @@ public class CatifyModClient implements ClientModInitializer {
 //			}
 //		});
 
-		ServerWorldEvents.UNLOAD.register((server, world) -> {
+        ServerLevelEvents.UNLOAD.register((server, world) -> {
 			PlayerToCatReplacer.cleanup();
 		});
 
