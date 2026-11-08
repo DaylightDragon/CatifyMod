@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class StateStorage {
     public static Map<EntityRenderState, UUID> currentStates = new HashMap<>(); // state to player uuid
+    public static UUID inventoryPlayerUUID = null; // state to player uuid
     public static Float inventoryRelativeHeadYaw = null;
     public static Float inventoryBodyYaw = null;
     public static Float inventoryPitch = null;

@@ -31,6 +31,7 @@ import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.CatVariant;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.daylight.CatifyModClient;
 import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
@@ -162,14 +163,25 @@ public class PlayerToCatReplacer {
         boolean sitting = sneaking && slowEnough;
         existingCat.setInSittingPose(sitting);
 
+//        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+
+//        float amplifiedSpeed = Math.min((float) horizontalSpeed * 8.0F, 1.5F);
+        float targetSpeed = (float) horizontalSpeed * 5.0F; // Math.min(, 1.0F);
+
         existingCat.walkAnimation.update(
-                getPlayerMovementSpeed(player),
-                0.9f,
-                1.0f
+                (float) targetSpeed,   // целевая скорость (на основе реального смещения)
+                0.9F,               // multiplier: сглаживание (0.4-0.9)
+                0.2F                // positionScale: масштаб фазы (1.0 для взрослых)
         );
 
+//        existingCat.walkAnimation.update(
+//                getPlayerMovementSpeed(player),
+//                0.9f,
+//                1.0f
+//        );
+//
         if (existingCat.walkAnimation instanceof LimbAnimatorAccessor acc) {
-            acc.caitify$setPosition(player.walkAnimation.position()); // TODO maybe missing partialtick
+            acc.caitify$setPosition(player.walkAnimation.position() * 0.1f); // TODO maybe missing partialtick
         }
     }
 

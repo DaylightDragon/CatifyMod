@@ -25,6 +25,7 @@ import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
 import org.daylight.util.WhitelistedScreensUtil;
+import org.daylight.util.flags.TemporaryFlags;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -61,7 +62,9 @@ public abstract class EntityRenderManagerMixin {
         if(StateStorage.currentlyRenderingUi && screen != null && !WhitelistedScreensUtil.isWhitelisted(screen)) return;
 
         if(renderState instanceof AvatarRenderState playerState) {
+//            System.out.println("aaa");
             if(StateStorage.currentStates.containsKey(playerState)) {
+//                System.out.println("bbbb");
                 UUID playerUuid = StateStorage.currentStates.get(playerState);
                 if(playerUuid == null) return;
                 Player player = PlayerToCatReplacer.getPlayerById(playerUuid);
@@ -75,11 +78,14 @@ public abstract class EntityRenderManagerMixin {
                 EntityRenderer<?, ? super S> originalRenderer = this.getRenderer(renderState);
                 float tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
+//                System.out.println("c " + player.getStringUUID());
+//                System.out.println(player.getXRot());
                 ci.cancel();
                 PlayerToCatReplacer.syncEntity2(player, cat);
 
                 catRenderer = (CatRenderer) this.getRenderer(cat);
                 catState = catRenderer.createRenderState(cat, tickDelta);
+//                System.out.println(catState.xRot);
 
                 if(playerState == null) playerState = (AvatarRenderState) getRenderer(player).createRenderState(player, tickDelta);
                 if(ConfigHandler.catDamageVisible.getCached()) catState.hasRedOverlay = playerState.hasRedOverlay;
@@ -87,9 +93,11 @@ public abstract class EntityRenderManagerMixin {
 
                 catState.lightCoords = playerState.lightCoords;
 
-                if(StateStorage.inventoryRelativeHeadYaw != null) catState.yRot = StateStorage.inventoryRelativeHeadYaw;
-                if(StateStorage.inventoryBodyYaw != null) catState.bodyRot = StateStorage.inventoryBodyYaw;
-                if(StateStorage.inventoryPitch != null) catState.xRot = StateStorage.inventoryPitch;
+                if(TemporaryFlags.CURRENTLY_RENDERING_INVENTORY.isSet() && TemporaryFlags.CURRENTLY_RENDERING_INVENTORY.get() == true) {
+                    if (StateStorage.inventoryRelativeHeadYaw != null) catState.yRot = StateStorage.inventoryRelativeHeadYaw;
+                    if (StateStorage.inventoryBodyYaw != null) catState.bodyRot = StateStorage.inventoryBodyYaw;
+                    if (StateStorage.inventoryPitch != null) catState.xRot = StateStorage.inventoryPitch;
+                }
 
                 CatChargeFeatureRenderer.getChargeData(cat).chargeActive = false;
 

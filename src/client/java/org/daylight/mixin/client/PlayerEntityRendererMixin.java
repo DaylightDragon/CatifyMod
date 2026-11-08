@@ -15,6 +15,7 @@ import org.daylight.config.Data;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
+import org.daylight.util.flags.TemporaryFlags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +34,13 @@ public abstract class PlayerEntityRendererMixin<AvatarlikeEntity extends Avatar 
     public void updateRenderState(AvatarlikeEntity entity, AvatarRenderState state, float partialTicks, CallbackInfo ci) {
         if(entity instanceof ClientAvatarEntity && state instanceof AvatarRenderState) {
 //            System.out.println("Adding from PlayerEntityRenderer: " + state);
-            StateStorage.currentStates.put(state, entity.getUUID());
+            if(TemporaryFlags.CURRENTLY_RENDERING_INVENTORY.isSet() && TemporaryFlags.CURRENTLY_RENDERING_INVENTORY.get() == true) {
+//                System.out.println("SET NEW -- INVENTORY -- STATE, state " + state + ", uuid " + entity.getStringUUID() + ", entity " + entity);
+                StateStorage.inventoryPlayerUUID = entity.getUUID();
+            } else {
+//                System.out.println("SET NEW STATE, state " + state + ", uuid " + entity.getStringUUID() + ", entity " + entity);
+                StateStorage.currentStates.put(state, entity.getUUID());
+            }
         }
     }
 
