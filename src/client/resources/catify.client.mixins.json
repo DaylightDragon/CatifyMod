@@ -12,13 +12,13 @@
     "EntityRendererAccessor",
     "EntityRendererMixin",
     "EntityRenderManagerMixin",
-    "RenderLayerAccessor",
     "GameRendererMixin",
     "GuiRendererMixin",
     "InventoryScreenMixin",
     "LimbAnimatorAccessor",
     "LivingEntityRendererMixin",
     "PlayerEntityRendererMixin",
+    "RenderLayerAccessor",
     "WorldRendererMixin"
   ],
   "verbose": false,
@@ -26,6 +26,7 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "EntityMixin"
+    "EntityMixin",
+    "GuiGraphicsExtractorMixin"
   ]
 }
