@@ -1,26 +1,19 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.entity.LimbAnimator;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.world.entity.WalkAnimationState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(LimbAnimator.class)
+@Mixin(WalkAnimationState.class)
 public interface LimbAnimatorAccessor {
-
-    @Accessor("animationProgress")
-    float getAnimationProgress();
-
-    @Accessor("animationProgress")
-    void setAnimationProgress(float progress);
+    @Invoker("position")
+    float caitify$setPosition(float value);
 
     @Accessor("speed")
-    float getSpeed();
+    float caitify$positiongetSpeed();
 
     @Accessor("speed")
-    void setSpeed(float speed);
+    void caitify$positionsetSpeed(float speed);
 }
 

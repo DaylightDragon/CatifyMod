@@ -1,11 +1,9 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.client.render.entity.CatEntityRenderer;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.state.CatEntityRenderState;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.CatRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.Entity;
 import org.daylight.CustomCatState;
 import org.daylight.IShadowHolder;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,21 +18,21 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
     public abstract float getShadowRadius(S state);
 
     @Shadow
-    public abstract float getShadowOpacity(S state);
+    public abstract float getShadowStrength(S state);
 
-    public float getShadowRadiusAccessor(CatEntityRenderState state) {
+    public float getShadowRadiusAccessor(CatRenderState state) {
         return getShadowRadius((S) state);
     }
 
-    public float getShadowOpacityAccessor(CatEntityRenderState state) {
-        return getShadowOpacity((S) state);
+    public float getShadowOpacityAccessor(CatRenderState state) {
+        return getShadowStrength((S) state);
     }
 
-    @Inject(method = "getAndUpdateRenderState", at = @At("RETURN"))
+    @Inject(method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;", at = @At("RETURN"))
     private void onGetAndUpdateRenderState(Entity entity, float tickDelta, CallbackInfoReturnable<EntityRenderState> cir) {
         EntityRenderState state = cir.getReturnValue();
         if (state instanceof CustomCatState customCatState) {
-            customCatState.catmodel$setCurrentEntityId(entity.getUuid());
+            customCatState.catmodel$setCurrentEntityId(entity.getUUID());
         }
     }
 }

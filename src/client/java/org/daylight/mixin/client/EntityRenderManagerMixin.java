@@ -148,7 +148,7 @@ public abstract class EntityRenderManagerMixin {
 
                             CatChargeFeatureRenderer.getChargeData(cat).chargeActive = true;
 
-                            featureManager.getCatChargeFeatureRenderer().customRender(matrices, submitNodeCollector, catState.lightCoords, catState, catState.yRot, catState.xRot);
+                            featureManager.catModel$getCatChargeFeatureRenderer().customRender(matrices, submitNodeCollector, catState.lightCoords, catState, catState.yRot, catState.xRot);
                         } catch (Throwable e) {
                             e.printStackTrace();
                         } finally {

@@ -106,12 +106,12 @@ public class CatChargeFeatureRenderer<S extends EntityRenderState>
 //        this.currentState = null;
     }
 
-    private void internalRender(PoseStack matrices, SubmitNodeCollector queue, int light, CatRenderState state, float limbAngle, float limbDistance) {
+    private void internalRender(PoseStack matrices, SubmitNodeCollector collector, int light, CatRenderState state, float limbAngle, float limbDistance) {
         if(state instanceof CatRenderState catEntityRenderState && this instanceof IRenderableFeature<?> renderableFeature) {
             if (this.isPowered(catEntityRenderState)) {
                 AdultCatModel entityModel = this.model();
                 entityModel.setupAnim(catEntityRenderState);
-                renderableFeature.catify$render(matrices, queue, light, state, limbAngle, limbDistance);
+                renderableFeature.catify$render(matrices, collector, light, state, limbAngle, limbDistance);
 //                entityModel.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, -8355712);
             }
         }

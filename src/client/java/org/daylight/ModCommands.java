@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.animal.feline.CatVariant;
@@ -44,19 +45,19 @@ public class ModCommands {
     }
 
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, context) -> {
             dispatcher.register(ClientCommands.literal("catvariant")
                     .then(ClientCommands.argument("variant", StringArgumentType.word())
-                            .suggests((context, builder) -> suggestVariants(builder, CatSkinManager.ALL_VARIANTS))
-                            .executes(context -> {
+                            .suggests((suggestContext, builder) -> suggestVariants(builder, CatSkinManager.ALL_VARIANTS))
+                            .executes(argContext -> {
                                 Minecraft client = Minecraft.getInstance();
                                 if (client.player == null) return 0;
 
-                                String variantName = StringArgumentType.getString(context, "variant");
+                                String variantName = StringArgumentType.getString(argContext, "variant");
 
                                 try {
                                     if(CatSkinManager.isVanillaVariant(variantName)) {
-                                        ResourceKey<CatVariant> variant = CatVariantUtils.deserializeVariant(variantName);
+                                        Holder<CatVariant> variant = CatVariantUtils.deserializeVariant(argContext.getSource().registryAccess(), variantName);
                                         String name = CatVariantUtils.serializeVariant(variant);
 //                                      PlayerCatData.setCatVariant(client.player.getUuid(), variant);
 
@@ -77,7 +78,7 @@ public class ModCommands {
                                         ConfigHandler.catVariantVanilla.set(false);
                                         ConfigHandler.CONFIG.save();
 
-                                        if(PlayerToCatReplacer.setCustomCatEntityTexture(Minecraft.getInstance().player, finalVariantName)) {
+                                        if(PlayerToCatReplacer.setCustomCatTexture(Minecraft.getInstance().player, finalVariantName)) {
                                             if(mc.player != null) mc.player.sendSystemMessage(
                                                     Component.literal("§fNow set your cat skin to: §a§l" + variantName)
                                             );
@@ -110,11 +111,11 @@ public class ModCommands {
             );
 
             dispatcher.register(ClientCommands.literal("catmode")
-                .executes(context -> performSetCatActive(!ConfigHandler.replacementActive.get()))
+                .executes(catModeContext -> performSetCatActive(!ConfigHandler.replacementActive.get()))
                 .then(ClientCommands.argument("state", StringArgumentType.word())
-                    .suggests((context, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                    .executes(context -> {
-                        Boolean state = getOnOffState(context, "state");
+                    .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                    .executes(argContext -> {
+                        Boolean state = getOnOffState(argContext, "state");
                         if(state != null) return performSetCatActive(state);
                         else return 0;
                     })
@@ -122,11 +123,11 @@ public class ModCommands {
             );
 
             dispatcher.register(ClientCommands.literal("cathand")
-                    .executes(context -> performSetCatHandActive(!ConfigHandler.catHandActive.get()))
+                    .executes(catHandContext -> performSetCatHandActive(!ConfigHandler.catHandActive.get()))
                     .then(ClientCommands.argument("state", StringArgumentType.word())
-                            .suggests((context, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                            .executes(context -> {
-                                Boolean state = getOnOffState(context, "state");
+                            .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                            .executes(argContext -> {
+                                Boolean state = getOnOffState(argContext, "state");
                                 if(state != null) {
                                     if(state && Data.catHandTexture == null && !ConfigHandler.catVariantVanilla.get()) {
                                         if(Minecraft.getInstance().player != null) Minecraft.getInstance().player.sendSystemMessage(
@@ -141,11 +142,11 @@ public class ModCommands {
             );
 
             dispatcher.register(ClientCommands.literal("catdamage")
-                    .executes(context -> performSetCatDamageVisible(!ConfigHandler.catDamageVisible.get()))
+                    .executes(catDamageContext -> performSetCatDamageVisible(!ConfigHandler.catDamageVisible.get()))
                     .then(ClientCommands.argument("visible", StringArgumentType.word())
-                            .suggests((context, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                            .executes(context -> {
-                                Boolean state = getOnOffState(context, "visible");
+                            .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                            .executes(argContext -> {
+                                Boolean state = getOnOffState(argContext, "visible");
                                 if(state != null) return performSetCatDamageVisible(state);
                                 else return 0;
                             })
@@ -154,10 +155,10 @@ public class ModCommands {
 
             dispatcher.register(ClientCommands.literal("catinvisibility")
                     .then(ClientCommands.argument("mode", StringArgumentType.word())
-                            .suggests((context, builder) -> suggestVariants(builder, INVISIBILITY_MODES))
-                            .executes(context -> {
+                            .suggests((suggestionContext, builder) -> suggestVariants(builder, INVISIBILITY_MODES))
+                            .executes(argContext -> {
                                 Minecraft mc = Minecraft.getInstance();
-                                String stateStr = StringArgumentType.getString(context, "mode");
+                                String stateStr = StringArgumentType.getString(argContext, "mode");
 
                                 InvisibilityBehaviour behaviour;
                                 if(stateStr.equalsIgnoreCase("never")) {

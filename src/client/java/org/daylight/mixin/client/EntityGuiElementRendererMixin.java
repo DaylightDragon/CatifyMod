@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.entity.state.CatRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.feline.Cat;
-import org.daylight.IElementWVertexConsumerProvider;
 import org.daylight.IFeatureManager;
 import org.daylight.IModifiableGuiElement;
 import org.daylight.ModResources;
@@ -62,8 +61,7 @@ public class EntityGuiElementRendererMixin { // NEW
 //        System.out.println(state instanceof IModifiableGuiElement);
 
         if (ConfigHandler.replacementActive.getCached() && state.renderState().entityType == EntityType.PLAYER) {
-            if ((Object) this instanceof IElementWVertexConsumerProvider elementWVertexes
-                    && (Object) state instanceof IModifiableGuiElement modifiableGuiElement
+            if ((Object) state instanceof IModifiableGuiElement modifiableGuiElement
                     && (Object) state.renderState() instanceof AvatarRenderState playerEntityRenderState) {
                 MultiBufferSource vertexConsumerProvider = Minecraft.getInstance().renderBuffers().bufferSource();
 //                VertexConsumerProvider vertexConsumerProvider = elementWVertexes.getVertexConsumers();
