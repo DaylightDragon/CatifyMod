@@ -2,6 +2,7 @@ package org.daylight.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.CatRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -16,6 +17,7 @@ import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.daylight.util.flags.TemporaryFlags;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -75,6 +77,9 @@ public class GuiGraphicsExtractorMixin {
 
         Cat cat = (Cat) PlayerToCatReplacer.getCatForPlayer(player);
         if (cat == null) return original;
+
+        Screen screen = Minecraft.getInstance().screen;
+        if(screen != null && !WhitelistedScreensUtil.isWhitelisted(screen)) return original;
 
         // Синхронизируем данные кошки (используя ваш syncEntity2 и т.д.)
         PlayerToCatReplacer.syncEntity2(player, cat);

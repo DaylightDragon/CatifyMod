@@ -162,7 +162,7 @@ public class PlayerToCatReplacer {
 //        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
 //        float amplifiedSpeed = Math.min((float) horizontalSpeed * 8.0F, 1.5F);
-        float targetSpeed = (float) horizontalSpeed * 4.5F; // Math.min(, 1.0F);
+        float targetSpeed = Math.min((float) horizontalSpeed * 4.5F, 1.0F); // Math.min(, 1.0F);
 
         existingCat.walkAnimation.update(
                 (float) targetSpeed,   // целевая скорость (на основе реального смещения)

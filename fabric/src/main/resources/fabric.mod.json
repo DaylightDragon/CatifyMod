@@ -3,15 +3,14 @@
   "id": "catify",
   "version": "${version}",
   "name": "Catify",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "A client-side mod that changes your player model to a cat! Purely visual.",
   "authors": [
-    "Me!"
+    "DaylightDragon"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/DaylightDragon/CatifyMod"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/catify/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -27,12 +26,12 @@
     "fabric-catify.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.20.1",
+    "fabricloader": "*",
     "minecraft": "~26.1",
     "java": ">=25",
     "fabric-api": "*"
   },
   "suggests": {
-    "another-mod": "*"
+
   }
 }

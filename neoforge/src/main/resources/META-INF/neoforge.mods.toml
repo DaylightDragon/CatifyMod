@@ -1,17 +1,18 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/DaylightDragon/CatifyMod/issues/"
+license = "MIT"
 
 [[mods]]
 modId = "catify"
 version = "${version}"
-displayName = "Example Mod"
-authors = "Me!"
+displayName = "Catify"
+authors = "DaylightDragon"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+A client-side mod that changes your player model to a cat! Purely visual.
 '''
-#logoFile = ""
+iconFile = "assets/catify/icon.png"
+bannerFile = "assets/catify/banner.png"
 
 [[dependencies.catify]]
 modId = "neoforge"

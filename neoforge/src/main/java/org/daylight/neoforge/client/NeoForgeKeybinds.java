@@ -14,7 +14,7 @@ public class NeoForgeKeybinds {
     private static void initCustomKeybinds() {
         ModKeybindListeners.WHITELIST_SCREEN_KEY_LISTENER = new InputBasedHotkeyListener(
                 () -> ModKeybindListeners.WHITELIST_SCREEN_KEY.getKey().getValue(),
-                () -> {}, // ModKeybindListeners::toggleMouseLock,
+                ModKeybindListeners::onWhitelistKeyPressed,
                 ModKeybindListeners.DEFAULT_VALIDATOR
         );
     }

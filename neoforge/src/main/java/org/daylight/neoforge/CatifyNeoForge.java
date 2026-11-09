@@ -10,6 +10,5 @@ public final class CatifyNeoForge {
         Catify.init();
 
         NeoForgeConfigInitialization.init();
-        NeoForgeKeybinds.init();
     }
 }

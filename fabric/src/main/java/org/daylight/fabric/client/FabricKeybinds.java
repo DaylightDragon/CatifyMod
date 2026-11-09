@@ -28,7 +28,7 @@ public class FabricKeybinds {
     private static void initCustomKeybinds() {
         ModKeybindListeners.WHITELIST_SCREEN_KEY_LISTENER = new TickBasedHotkeyListener(
                 () -> KeyMappingHelper.getBoundKeyOf(ModKeybindListeners.WHITELIST_SCREEN_KEY).getValue(), // TODO CHECK IF OPTIMIZED
-                () -> {}, // ModKeybindListeners::toggleMouseLock,
+                ModKeybindListeners::onWhitelistKeyPressed,
                 ModKeybindListeners.DEFAULT_VALIDATOR
         );
     }
