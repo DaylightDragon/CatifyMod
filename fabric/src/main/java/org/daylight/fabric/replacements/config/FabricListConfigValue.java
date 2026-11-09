@@ -1,7 +1,7 @@
 package org.daylight.fabric.replacements.config;
 
-import org.daylight.client.config.SimpleConfig;
-import org.daylight.client.replacements.common.IListConfigValue;
+import org.daylight.config.SimpleConfig;
+import org.daylight.replacements.common.IListConfigValue;
 
 import java.util.List;
 

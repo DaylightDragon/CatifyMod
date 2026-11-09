@@ -1,7 +1,7 @@
 package org.daylight.mixin.client;
 
 import net.minecraft.world.entity.Entity;
-import org.daylight.client.features.CatChargeFeatureRenderer;
+import org.daylight.features.CatChargeFeatureRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

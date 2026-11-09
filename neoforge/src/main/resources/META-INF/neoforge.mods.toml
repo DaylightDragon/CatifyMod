@@ -16,14 +16,14 @@ This is an example description! Tell everyone what your mod is about!
 [[dependencies.catify]]
 modId = "neoforge"
 type = "required"
-versionRange = "[26.1.2,)"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.catify]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.1.2,)"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 

@@ -1,8 +1,8 @@
 package org.daylight.fabric.replacements.config;
 
-import org.daylight.client.InvisibilityBehaviour;
-import org.daylight.client.config.SimpleConfig;
-import org.daylight.client.replacements.common.IConfigValue;
+import org.daylight.InvisibilityBehaviour;
+import org.daylight.config.SimpleConfig;
+import org.daylight.replacements.common.IConfigValue;
 
 public class FabricConfigValue<T> implements IConfigValue<T> {
     private final SimpleConfig config;

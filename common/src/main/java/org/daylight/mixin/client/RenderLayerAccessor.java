@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.CatRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import org.daylight.client.IRenderableFeature;
+import org.daylight.interfaces.IRenderableFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 

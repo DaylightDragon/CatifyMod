@@ -2,8 +2,8 @@ package org.daylight.mixin.client;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.animal.feline.Cat;
-import org.daylight.client.CustomCatTextureHolder;
-import org.daylight.client.util.PlayerToCatReplacer;
+import org.daylight.interfaces.CustomCatTextureHolder;
+import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

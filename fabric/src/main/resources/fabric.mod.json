@@ -19,7 +19,7 @@
       "org.daylight.fabric.CatifyFabric"
     ],
     "client": [
-      "org.daylight.fabric.client.CatifyFabricClient"
+      "org.daylight.fabric.CatifyFabricClient"
     ]
   },
   "mixins": [

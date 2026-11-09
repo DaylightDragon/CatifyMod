@@ -1,7 +1,7 @@
 package org.daylight.mixin.client;
 
 import net.minecraft.client.renderer.entity.state.CatRenderState;
-import org.daylight.client.CustomCatState;
+import org.daylight.interfaces.CustomCatState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

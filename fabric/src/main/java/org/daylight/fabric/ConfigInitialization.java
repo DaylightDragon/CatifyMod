@@ -1,8 +1,8 @@
 package org.daylight.fabric;
 
-import org.daylight.client.InvisibilityBehaviour;
-import org.daylight.client.config.ConfigHandler;
-import org.daylight.client.util.WhitelistedScreensUtil;
+import org.daylight.InvisibilityBehaviour;
+import org.daylight.config.ConfigHandler;
+import org.daylight.util.WhitelistedScreensUtil;
 import org.daylight.fabric.replacements.config.FabricBooleanConfigValue;
 import org.daylight.fabric.replacements.config.FabricEnumConfigValue;
 import org.daylight.fabric.replacements.config.FabricListConfigValue;

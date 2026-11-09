@@ -1,7 +1,7 @@
 package org.daylight.mixin.client;
 
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
-import org.daylight.client.IModifiableGuiElement;
+import org.daylight.interfaces.IModifiableGuiElement;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

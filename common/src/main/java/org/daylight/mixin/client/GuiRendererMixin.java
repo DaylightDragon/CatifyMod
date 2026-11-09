@@ -4,7 +4,7 @@ import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
-import org.daylight.client.util.StateStorage;
+import org.daylight.util.StateStorage;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
