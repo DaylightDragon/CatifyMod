@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "org.daylight.fabric.mixin",
+  "package": "org.daylight.catify.fabric.mixin",
   "compatibilityLevel": "JAVA_25",
   "minVersion": "0.8",
   "client": [

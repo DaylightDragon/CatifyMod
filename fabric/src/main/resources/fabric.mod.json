@@ -15,10 +15,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.daylight.fabric.CatifyFabric"
+      "org.daylight.catify.fabric.CatifyFabric"
     ],
     "client": [
-      "org.daylight.fabric.CatifyFabricClient"
+      "org.daylight.catify.fabric.CatifyFabricClient"
     ]
   },
   "mixins": [

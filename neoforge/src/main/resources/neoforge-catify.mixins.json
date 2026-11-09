@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "org.daylight.neoforge.mixin",
+  "package": "org.daylight.catify.neoforge.mixin",
   "compatibilityLevel": "JAVA_25",
   "minVersion": "0.8",
   "client": [
