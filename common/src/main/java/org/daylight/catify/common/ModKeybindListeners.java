@@ -9,7 +9,7 @@ import org.daylight.catify.common.util.hotkey.IHotkeyListener;
 import java.util.function.Supplier;
 
 public class ModKeybindListeners {
-    public static final Supplier<Boolean> DEFAULT_VALIDATOR = () -> Minecraft.getInstance().screen != null;
+    public static final Supplier<Boolean> DEFAULT_VALIDATOR = () -> Minecraft.getInstance().gui.screen() != null;
 
     public static KeyMapping.Category KEYBIND_CATEGORY;
 
@@ -26,6 +26,6 @@ public class ModKeybindListeners {
     public static IHotkeyListener WHITELIST_SCREEN_KEY_LISTENER;
 
     public static void onWhitelistKeyPressed() {
-        WhitelistedScreensUtil.toggleScreen(Minecraft.getInstance().screen);
+        WhitelistedScreensUtil.toggleScreen(Minecraft.getInstance().gui.screen());
     }
 }

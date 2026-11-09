@@ -8,8 +8,6 @@
     "client.CatEntityMixin",
     "client.CatEntityRendererMixin",
     "client.CatEntityRenderStateMixin",
-    "client.EntityGuiElementRendererMixin",
-    "client.EntityGuiElementRenderStateMixin",
     "client.EntityRendererAccessor",
     "client.EntityRendererMixin",
     "client.EntityRenderManagerMixin",

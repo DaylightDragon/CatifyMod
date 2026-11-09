@@ -19,9 +19,8 @@ import org.daylight.catify.common.util.PlayerToCatReplacer;
 import org.daylight.catify.common.util.StateStorage;
 import org.daylight.catify.common.util.WhitelistedScreensUtil;
 import org.daylight.catify.common.util.flags.TemporaryFlags;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,7 +52,7 @@ public class GuiGraphicsExtractorMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    public void entity(final EntityRenderState renderState, final float scale, final Vector3f translation, final Quaternionf rotation, final @Nullable Quaternionf overrideCameraAngle, final int x0, final int y0, final int x1, final int y1, CallbackInfo ci) {
+    public void entity(EntityRenderState renderState, float scale, Vector3fc translation, Quaternionfc rotation, Quaternionfc overrideCameraAngle, int x0, int y0, int x1, int y1, CallbackInfo ci) {
         EntityRenderState stateToRender = getNewState(renderState, x0, x1, y0, y1);
         if(stateToRender == null) stateToRender = renderState;
         else {
@@ -78,7 +77,7 @@ public class GuiGraphicsExtractorMixin {
         Cat cat = (Cat) PlayerToCatReplacer.getCatForPlayer(player);
         if (cat == null) return original;
 
-        Screen screen = Minecraft.getInstance().screen;
+        Screen screen = Minecraft.getInstance().gui.screen();
         if(screen != null && !WhitelistedScreensUtil.isWhitelisted(screen)) return original;
 
         // Синхронизируем данные кошки (используя ваш syncEntity2 и т.д.)

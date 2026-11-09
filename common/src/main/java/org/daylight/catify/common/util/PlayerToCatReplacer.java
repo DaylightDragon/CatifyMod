@@ -21,6 +21,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.CatVariant;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -47,7 +49,7 @@ import java.util.function.Supplier;
 public class PlayerToCatReplacer {
     public static final Logger LOGGER = LoggerFactory.getLogger(Catify.MOD_ID);
     private static final Minecraft client = Minecraft.getInstance();
-    private static final Map<UUID, LivingEntity> dummyModelMap = new HashMap<>();
+    private static final Map<UUID, LivingEntity> dummyModelMap = new IdentityHashMap<>(); // is it correct?
     private static Level targetWorld;
 
     public static void initWorld() {
@@ -60,7 +62,8 @@ public class PlayerToCatReplacer {
     public static void replaceWithCat(AbstractClientPlayer player) {
         if (dummyModelMap.containsKey(player.getUUID())) return;
 
-        Cat cat = new Cat(EntityType.CAT, targetWorld);
+        Cat cat = new Cat(EntityTypes.CAT, targetWorld);
+        cat.setId(-1);
         if(ConfigHandler.catVariantVanilla.get()) changeCatVariant(cat, CatVariantUtils.deserializeVariant(targetWorld.registryAccess(), ConfigHandler.catVariant.get()));
         cat.setTame(false, false);
 //        cat.setOwner(player);

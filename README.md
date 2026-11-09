@@ -67,6 +67,9 @@ There should be no chance a server anticheat can notice a difference, so it's co
 - All settings that you change with commands are saved between sessions, including cat skin, cat hand, cat mode.  
 
 ## Versions
+NeoForge + Fabric:  
+- 26.1 - 26.1.2 (more to come)  
+
 Fabric:  
 - 1.21.2 - 1.21.10  
 - This repository branch is for versions 1.21.11+  
@@ -78,5 +81,4 @@ Reason: couldn't force a "translucent" effect show up in gui. If someone knows a
 
 ## Building the project
 
-The project was built with `JDK 23` and language level `21` in Intellij IDEA.  
-More specifically, GraalVM JDK, but that shouldn't be required. I generally recommend Temurin JDK.  
+The project was built with `Temurin JDK 25` in Intellij IDEA.  
