@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "org.daylight.neoforge.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "AvatarRendererNeoForgeMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

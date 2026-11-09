@@ -9,6 +9,7 @@ public final class CatifyNeoForge {
     public CatifyNeoForge() {
         Catify.init();
 
+        NeoForgeConfigInitialization.init();
         NeoForgeKeybinds.init();
     }
 }

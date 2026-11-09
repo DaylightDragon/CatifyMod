@@ -44,29 +44,29 @@ public abstract class PlayerEntityRendererMixin<AvatarlikeEntity extends Avatar 
         }
     }
 
-    @ModifyArg(
-            method = "renderRightHand",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V")
-    )
-    private Identifier replaceRightArmSkin(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
-                PlayerToCatReplacer.shouldReplace(getPlayer())) {
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
-    }
-
-    @ModifyArg(
-            method = "renderLeftHand",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V")
-    )
-    private Identifier replaceLeftArmSkin(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
-                && PlayerToCatReplacer.shouldReplace(getPlayer())) {
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
-    }
+//    @ModifyArg(
+//            method = "renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V",
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V", remap = false)
+//    )
+//    private Identifier replaceRightArmSkin(Identifier skinTexture) {
+//        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
+//                PlayerToCatReplacer.shouldReplace(getPlayer())) {
+//            return getHandTexture(skinTexture);
+//        }
+//        return skinTexture;
+//    }
+//
+//    @ModifyArg(
+//            method = "renderLeftHand",
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V")
+//    )
+//    private Identifier replaceLeftArmSkin(Identifier skinTexture) {
+//        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
+//                && PlayerToCatReplacer.shouldReplace(getPlayer())) {
+//            return getHandTexture(skinTexture);
+//        }
+//        return skinTexture;
+//    }
 
     @Unique
     private Identifier getHandTexture(Identifier defaultValue) {

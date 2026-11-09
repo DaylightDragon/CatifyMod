@@ -23,7 +23,8 @@
     ]
   },
   "mixins": [
-    "catify.mixins.json"
+    "catify.mixins.json",
+    "fabric-catify.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.20.1",
