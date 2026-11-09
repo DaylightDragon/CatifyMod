@@ -38,3 +38,9 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+common/build
+fabric/build
+fabric/run
+neoforge/build
+neoforge/run

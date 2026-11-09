@@ -1,0 +1,32 @@
+{
+  "required": true,
+  "package": "org.daylight.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "client.CatEntityAccessor",
+    "client.CatEntityMixin",
+    "client.CatEntityRendererMixin",
+    "client.CatEntityRenderStateMixin",
+    "client.EntityGuiElementRendererMixin",
+    "client.EntityGuiElementRenderStateMixin",
+    "client.EntityRendererAccessor",
+    "client.EntityRendererMixin",
+    "client.EntityRenderManagerMixin",
+    "client.GameRendererMixin",
+    "client.GuiRendererMixin",
+    "client.InventoryScreenMixin",
+    "client.LimbAnimatorAccessor",
+    "client.LivingEntityRendererMixin",
+    "client.PlayerEntityRendererMixin",
+    "client.RenderLayerAccessor",
+    "client.WorldRendererMixin"
+  ],
+  "mixins": [
+    "client.EntityMixin",
+    "client.GuiGraphicsExtractorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
