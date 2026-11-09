@@ -89,7 +89,7 @@ public class NeoForgeCommands {
                                             } else {
                                                 client.player.sendSystemMessage(Component.literal(
                                                         "§cCouldn't find §l§f" + variantName
-                                                                + ".png §r§c in §l§f/data/catify/cat_enitity_skins"));
+                                                                + ".png §r§c in §l§f/config/catify/cat_enitity_skins"));
                                                 return 0;
                                             }
                                         } else {
@@ -106,7 +106,7 @@ public class NeoForgeCommands {
                         )
                 )
                 // /catify mode [state]
-                .then(Commands.literal("mode")
+                .then(Commands.literal("enabled")
                         .executes(ctx -> performSetCatActive(!ConfigHandler.replacementActive.get()))
                         .then(Commands.argument("state", StringArgumentType.word())
                                 .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))

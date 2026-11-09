@@ -57,7 +57,7 @@ public class NeoForgeOwnResourceReloadListener extends SimplePreparableReloadLis
 
     private Path createOutputDir(String folderName) {
         Path outputDir = Minecraft.getInstance().gameDirectory.toPath()
-                .resolve("data/catify/example_skins/" + folderName);
+                .resolve("config/catify/example_skins/" + folderName);
         try {
             Files.createDirectories(outputDir);
         } catch (IOException e) {

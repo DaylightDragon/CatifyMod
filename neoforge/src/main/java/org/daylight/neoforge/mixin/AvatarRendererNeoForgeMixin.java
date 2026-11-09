@@ -11,6 +11,7 @@ import net.minecraft.world.entity.animal.feline.CatVariant;
 import org.daylight.ModResources;
 import org.daylight.config.ConfigHandler;
 import org.daylight.config.Data;
+import org.daylight.util.CatSkinManager;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,11 +28,7 @@ public abstract class AvatarRendererNeoForgeMixin<AvatarlikeEntity extends Avata
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V", remap = false)
     )
     private Identifier replaceRightArmSkin1(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
-                PlayerToCatReplacer.shouldReplace(getPlayer())) {
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
+        return determineOnReplacingHandTexture(skinTexture);
     }
 
     @ModifyArg(
@@ -39,22 +36,32 @@ public abstract class AvatarRendererNeoForgeMixin<AvatarlikeEntity extends Avata
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V", remap = false)
     )
     private Identifier replaceRightArmSkin2(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
-                PlayerToCatReplacer.shouldReplace(getPlayer())) {
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
+        return determineOnReplacingHandTexture(skinTexture);
+    }
+
+    @ModifyArg(
+            method = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V")
+    )
+    private Identifier replaceLeftArmSkin1(Identifier skinTexture) {
+        return determineOnReplacingHandTexture(skinTexture);
+    }
+
+    @ModifyArg(
+            method = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V")
+    )
+    private Identifier replaceLeftArmSkin2(Identifier skinTexture) {
+        return determineOnReplacingHandTexture(skinTexture);
     }
 
     @Unique
-    private Identifier getHandTexture(Identifier defaultValue) {
-        if(!ConfigHandler.catVariantVanilla.getCached() || Minecraft.getInstance().player == null) {
-            if(Data.catHandTexture != null) return Data.catHandTexture;
-            else return defaultValue;
+    private Identifier determineOnReplacingHandTexture(Identifier original) {
+        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
+                && PlayerToCatReplacer.shouldReplace(getPlayer())) {
+            return CatSkinManager.getHandTexture(original);
         }
-        Optional<ResourceKey<CatVariant>> optional = CatVariantUtils.deserializeVariant(Minecraft.getInstance().player.registryAccess(), ConfigHandler.catVariant.getCached()).unwrapKey();
-        if(optional.isEmpty()) return defaultValue;
-        return ModResources.CAT_HAND_BY_VARIANT.get(optional.get());
+        return original;
     }
 
     @Unique

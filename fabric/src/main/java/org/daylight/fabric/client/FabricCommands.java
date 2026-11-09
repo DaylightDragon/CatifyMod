@@ -1,6 +1,7 @@
 package org.daylight.fabric.client;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -8,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.feline.CatVariant;
@@ -45,151 +47,142 @@ public class FabricCommands {
     }
 
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, context) -> {
-            dispatcher.register(ClientCommands.literal("catvariant")
-                    .then(ClientCommands.argument("variant", StringArgumentType.word())
-                            .suggests((suggestContext, builder) -> suggestVariants(builder, CatSkinManager.ALL_VARIANTS))
-                            .executes(argContext -> {
-                                Minecraft client = Minecraft.getInstance();
-                                if (client.player == null) return 0;
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(prepareCommands());
+        });
+    }
 
-                                String variantName = StringArgumentType.getString(argContext, "variant");
+    public static LiteralArgumentBuilder<FabricClientCommandSource> prepareCommands() {
+        return ClientCommands.literal("catify")
+                // /catify variant <variant>
+                .then(ClientCommands.literal("variant")
+                        .then(ClientCommands.argument("variant", StringArgumentType.word())
+                                .suggests((suggestContext, builder) -> suggestVariants(builder, CatSkinManager.ALL_VARIANTS))
+                                .executes(argContext -> {
+                                    Minecraft client = Minecraft.getInstance();
+                                    if (client.player == null) return 0;
 
-                                try {
-                                    if(CatSkinManager.isVanillaVariant(variantName)) {
-                                        Holder<CatVariant> variant = CatVariantUtils.deserializeVariant(argContext.getSource().registryAccess(), variantName);
-                                        String name = CatVariantUtils.serializeVariant(variant);
-//                                      PlayerCatData.setCatVariant(client.player.getUuid(), variant);
+                                    String variantName = StringArgumentType.getString(argContext, "variant");
 
-                                        ConfigHandler.catVariant.set(name);
-                                        ConfigHandler.catVariantVanilla.set(true);
-                                        PlayerToCatReplacer.setLocalCatVariant(variant);
-                                        ConfigHandler.CONFIG.save();
+                                    try {
+                                        if (CatSkinManager.isVanillaVariant(variantName)) {
+                                            Holder<CatVariant> variant = CatVariantUtils.deserializeVariant(
+                                                    argContext.getSource().registryAccess(), variantName);
+                                            String name = CatVariantUtils.serializeVariant(variant);
 
-                                        client.player.sendSystemMessage(
-                                                Component.literal("§fNow set your cat skin to: §a§l" + name.toLowerCase(Locale.ROOT))
-                                        );
-                                        return 1;
-                                    } else if(CatSkinManager.getActualCustomFileName(variantName) != null) {
-                                        Minecraft mc = Minecraft.getInstance();
-                                        String finalVariantName = CatSkinManager.getActualCustomFileName(variantName);
+                                            ConfigHandler.catVariant.set(name);
+                                            ConfigHandler.catVariantVanilla.set(true);
+                                            PlayerToCatReplacer.setLocalCatVariant(variant);
+                                            ConfigHandler.CONFIG.save();
 
-                                        ConfigHandler.catVariant.set(finalVariantName);
-                                        ConfigHandler.catVariantVanilla.set(false);
-                                        ConfigHandler.CONFIG.save();
-
-                                        if(PlayerToCatReplacer.setCustomCatTexture(Minecraft.getInstance().player, finalVariantName)) {
-                                            if(mc.player != null) mc.player.sendSystemMessage(
-                                                    Component.literal("§fNow set your cat skin to: §a§l" + variantName)
-                                            );
-                                            if(!PlayerToCatReplacer.setCustomCatHandTexture(finalVariantName) && ConfigHandler.catHandActive.get()) {
-                                                if(mc.player != null) mc.player.sendSystemMessage(
-                                                        Component.literal("§eWarning: Couldn't find a texture for custom hand §l§f" + variantName)
-                                                );
-                                            }
+                                            client.player.sendSystemMessage(Component.literal(
+                                                    "§fNow set your cat skin to: §a§l" + name.toLowerCase(Locale.ROOT)));
                                             return 1;
+                                        } else if (CatSkinManager.getActualCustomFileName(variantName) != null) {
+                                            String finalVariantName = CatSkinManager.getActualCustomFileName(variantName);
+
+                                            ConfigHandler.catVariant.set(finalVariantName);
+                                            ConfigHandler.catVariantVanilla.set(false);
+                                            ConfigHandler.CONFIG.save();
+
+                                            if (PlayerToCatReplacer.setCustomCatTexture(client.player, finalVariantName)) {
+                                                client.player.sendSystemMessage(Component.literal(
+                                                        "§fNow set your cat skin to: §a§l" + variantName));
+                                                if (!PlayerToCatReplacer.setCustomCatHandTexture(finalVariantName)
+                                                        && ConfigHandler.catHandActive.get()) {
+                                                    client.player.sendSystemMessage(Component.literal(
+                                                            "§eWarning: Couldn't find a texture for custom hand §l§f" + variantName));
+                                                }
+                                                return 1;
+                                            } else {
+                                                client.player.sendSystemMessage(Component.literal(
+                                                        "§cCouldn't find §l§f" + variantName
+                                                                + ".png §r§c in §l§f/config/catify/cat_enitity_skins"));
+                                                return 0;
+                                            }
                                         } else {
-                                            if(mc.player != null) mc.player.sendSystemMessage(
-                                                    Component.literal("§cCouldn't find §l§f" + variantName + ".png §r§c in §l§f/data/catify/cat_enitity_skins")
-                                            );
+                                            client.player.sendSystemMessage(Component.literal(
+                                                    "§cUnknown variant: §l§f" + ConfigHandler.catVariant.get()));
                                             return 0;
                                         }
-                                    } else {
-                                        client.player.sendSystemMessage(
-                                                Component.literal("§cUnknown variant: §l§f" + ConfigHandler.catVariant.get())
-                                        );
+                                    } catch (Exception e) {
+                                        client.player.sendSystemMessage(Component.literal(
+                                                "§cUnknown variant: §l§f" + ConfigHandler.catVariant.get()));
                                         return 0;
                                     }
-                                } catch (Exception e) {
-                                    client.player.sendSystemMessage(
-                                            Component.literal("§cUnknown variant: §l§f" + ConfigHandler.catVariant.get())
-                                    );
-                                    return 0;
-                                }
-                            })
-                    )
-            );
-
-            dispatcher.register(ClientCommands.literal("catmode")
-                .executes(catModeContext -> performSetCatActive(!ConfigHandler.replacementActive.get()))
-                .then(ClientCommands.argument("state", StringArgumentType.word())
-                    .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                    .executes(argContext -> {
-                        Boolean state = getOnOffState(argContext, "state");
-                        if(state != null) return performSetCatActive(state);
-                        else return 0;
-                    })
+                                })
+                        )
                 )
-            );
-
-            dispatcher.register(ClientCommands.literal("cathand")
-                    .executes(catHandContext -> performSetCatHandActive(!ConfigHandler.catHandActive.get()))
-                    .then(ClientCommands.argument("state", StringArgumentType.word())
-                            .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                            .executes(argContext -> {
-                                Boolean state = getOnOffState(argContext, "state");
-                                if(state != null) {
-                                    if(state && Data.catHandTexture == null && !ConfigHandler.catVariantVanilla.get()) {
-                                        if(Minecraft.getInstance().player != null) Minecraft.getInstance().player.sendSystemMessage(
-                                                Component.literal("§eWarning: Couldn't find a texture for the custom hand!")
-                                        );
+                // /catify mode [state]
+                .then(ClientCommands.literal("enabled")
+                        .executes(catModeContext -> performSetCatActive(!ConfigHandler.replacementActive.get()))
+                        .then(ClientCommands.argument("state", StringArgumentType.word())
+                                .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                                .executes(argContext -> {
+                                    Boolean state = getOnOffState(argContext, "state");
+                                    return state != null ? performSetCatActive(state) : 0;
+                                })
+                        )
+                )
+                // /catify hand [state]
+                .then(ClientCommands.literal("hand")
+                        .executes(catHandContext -> performSetCatHandActive(!ConfigHandler.catHandActive.get()))
+                        .then(ClientCommands.argument("state", StringArgumentType.word())
+                                .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                                .executes(argContext -> {
+                                    Boolean state = getOnOffState(argContext, "state");
+                                    if (state != null) {
+                                        if (state && Data.catHandTexture == null
+                                                && !ConfigHandler.catVariantVanilla.get()) {
+                                            if (Minecraft.getInstance().player != null) {
+                                                Minecraft.getInstance().player.sendSystemMessage(Component.literal(
+                                                        "§eWarning: Couldn't find a texture for the custom hand!"));
+                                            }
+                                        }
+                                        return performSetCatHandActive(state);
                                     }
-                                    return performSetCatHandActive(state);
-                                }
-                                else return 0;
-                            })
-                    )
-            );
-
-            dispatcher.register(ClientCommands.literal("catdamage")
-                    .executes(catDamageContext -> performSetCatDamageVisible(!ConfigHandler.catDamageVisible.get()))
-                    .then(ClientCommands.argument("visible", StringArgumentType.word())
-                            .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
-                            .executes(argContext -> {
-                                Boolean state = getOnOffState(argContext, "visible");
-                                if(state != null) return performSetCatDamageVisible(state);
-                                else return 0;
-                            })
-                    )
-            );
-
-            dispatcher.register(ClientCommands.literal("catinvisibility")
-                    .then(ClientCommands.argument("mode", StringArgumentType.word())
-                            .suggests((suggestionContext, builder) -> suggestVariants(builder, INVISIBILITY_MODES))
-                            .executes(argContext -> {
-                                Minecraft mc = Minecraft.getInstance();
-                                String stateStr = StringArgumentType.getString(argContext, "mode");
-
-                                InvisibilityBehaviour behaviour;
-                                if(stateStr.equalsIgnoreCase("never")) {
-                                    behaviour = InvisibilityBehaviour.NEVER;
-                                } else if(stateStr.equals("vanilla")) {
-                                    behaviour = InvisibilityBehaviour.VANILLA;
-                                } else if(stateStr.equals("charged")) {
-                                    behaviour = InvisibilityBehaviour.CHARGED;
-                                } else {
-                                    if(mc != null && mc.player != null) mc.player.sendSystemMessage(
-                                            Component.literal("§cUnexpected value: §l§f" + stateStr)
-                                    );
                                     return 0;
-                                }
+                                })
+                        )
+                )
+                // /catify damage [visible]
+                .then(ClientCommands.literal("damage")
+                        .executes(catDamageContext -> performSetCatDamageVisible(!ConfigHandler.catDamageVisible.get()))
+                        .then(ClientCommands.argument("visible", StringArgumentType.word())
+                                .suggests((suggestionContext, builder) -> suggestVariants(builder, MODES_OF_OFF))
+                                .executes(argContext -> {
+                                    Boolean state = getOnOffState(argContext, "visible");
+                                    return state != null ? performSetCatDamageVisible(state) : 0;
+                                })
+                        )
+                )
+                // /catify invisibility <mode>
+                .then(ClientCommands.literal("invisibility")
+                        .then(ClientCommands.argument("mode", StringArgumentType.word())
+                                .suggests((suggestionContext, builder) -> suggestVariants(builder, INVISIBILITY_MODES))
+                                .executes(argContext -> {
+                                    Minecraft mc = Minecraft.getInstance();
+                                    String stateStr = StringArgumentType.getString(argContext, "mode");
 
-                                return performSetInvisibilityBehaviour(behaviour);
-                            })
-                    )
-            );
+                                    InvisibilityBehaviour behaviour;
+                                    if (stateStr.equalsIgnoreCase("never")) {
+                                        behaviour = InvisibilityBehaviour.NEVER;
+                                    } else if (stateStr.equals("vanilla")) {
+                                        behaviour = InvisibilityBehaviour.VANILLA;
+                                    } else if (stateStr.equals("charged")) {
+                                        behaviour = InvisibilityBehaviour.CHARGED;
+                                    } else {
+                                        if (mc != null && mc.player != null) {
+                                            mc.player.sendSystemMessage(Component.literal(
+                                                    "§cUnexpected value: §l§f" + stateStr));
+                                        }
+                                        return 0;
+                                    }
 
-//            dispatcher.register(ClientCommands.literal("cattest")
-//                .executes(context -> {
-//                    Minecraft mc = Minecraft.getInstance();
-//
-//                    assert mc.player != null;
-//                    ItemStack stack = mc.player.getEquippedStack(EquipmentSlot.BODY);
-//
-//                    return 1;
-//                })
-//            );
-        });
+                                    return performSetInvisibilityBehaviour(behaviour);
+                                })
+                        )
+                );
     }
 
     private static Boolean getOnOffState(CommandContext<FabricClientCommandSource> context, String argumentName) {

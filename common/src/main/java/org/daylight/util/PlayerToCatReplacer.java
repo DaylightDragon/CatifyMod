@@ -242,7 +242,7 @@ public class PlayerToCatReplacer {
 
     public static Identifier loadCustomTexture(String subfolder, String skinName) {
         try {
-            String basePath = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/data/catify/" + subfolder;
+            String basePath = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/config/catify/" + subfolder;
             File folder = new File(basePath);
             folder.mkdirs();
 //            System.out.println(Arrays.toString(folder.listFiles()));

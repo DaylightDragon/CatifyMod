@@ -12,6 +12,7 @@ import net.minecraft.world.entity.animal.feline.CatVariant;
 import org.daylight.ModResources;
 import org.daylight.config.ConfigHandler;
 import org.daylight.config.Data;
+import org.daylight.util.CatSkinManager;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.daylight.util.StateStorage;
@@ -32,23 +33,26 @@ public abstract class AvatarRendererFabricMixin<AvatarlikeEntity extends Avatar 
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V", remap = false)
     )
     private Identifier replaceRightArmSkin(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
-                PlayerToCatReplacer.shouldReplace(getPlayer())) {
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
+        return determineOnReplacingHandTexture(skinTexture);
+    }
+
+    @ModifyArg(
+            method = "renderLeftHand",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Lnet/minecraft/client/model/geom/ModelPart;Z)V")
+    )
+    private Identifier replaceLeftArmSkin(Identifier skinTexture) {
+        return determineOnReplacingHandTexture(skinTexture);
     }
 
     @Unique
-    private Identifier getHandTexture(Identifier defaultValue) {
-        if(!ConfigHandler.catVariantVanilla.getCached() || Minecraft.getInstance().player == null) {
-            if(Data.catHandTexture != null) return Data.catHandTexture;
-            else return defaultValue;
+    private Identifier determineOnReplacingHandTexture(Identifier original) {
+        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
+                && PlayerToCatReplacer.shouldReplace(getPlayer())) {
+            return CatSkinManager.getHandTexture(original);
         }
-        Optional<ResourceKey<CatVariant>> optional = CatVariantUtils.deserializeVariant(Minecraft.getInstance().player.registryAccess(), ConfigHandler.catVariant.getCached()).unwrapKey();
-        if(optional.isEmpty()) return defaultValue;
-        return ModResources.CAT_HAND_BY_VARIANT.get(optional.get());
+        return original;
     }
+
 
     @Unique
     private AbstractClientPlayer getPlayer() {
