@@ -46,7 +46,7 @@ public class TickBasedHotkeyListener implements IHotkeyListener {
         }
 
         // Проверяем, зажата ли клавиша прямо сейчас
-        boolean isCurrentlyDown = InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), currentKey);
+        boolean isCurrentlyDown = InputConstants.isKeyDown(currentKey);
 
         // Логика Rising Edge (клавиша была отпущена, а теперь нажата)
         if (isCurrentlyDown && !wasDownLastTick) {

@@ -28,6 +28,7 @@ import org.daylight.catify.common.util.PlayerToCatReplacer;
 import org.daylight.catify.common.util.StateStorage;
 import org.daylight.catify.common.util.WhitelistedScreensUtil;
 import org.daylight.catify.common.util.flags.TemporaryFlags;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -150,8 +151,10 @@ public abstract class EntityRenderManagerMixin {
 
                         try {
                             float bodyYaw = catState.bodyRot; // or entity.getBodyYaw(tickDelta)
+                            Quaternionf rotation = new Quaternionf().rotateY((float) Math.toRadians(180.0F - bodyYaw));
+
                             matrices.translate(x, y, z); // inherited from normal cat render
-                            matrices.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+                            matrices.mulPose(new Matrix4f().rotate(rotation));
                             matrices.scale(-1.0F, -1.0F, 1.0F);
                             matrices.translate(0.0f, -1.501f, 0.0f);
 
