@@ -12,5 +12,4 @@ public class StateStorage {
     public static Float inventoryRelativeHeadYaw = null;
     public static Float inventoryBodyYaw = null;
     public static Float inventoryPitch = null;
-    public static boolean currentlyRenderingUi = false;
 }

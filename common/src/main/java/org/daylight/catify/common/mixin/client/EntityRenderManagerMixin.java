@@ -60,9 +60,6 @@ public abstract class EntityRenderManagerMixin {
     private <S extends EntityRenderState> void render(S renderState, CameraRenderState cameraRenderState, double x, double y, double z, PoseStack matrices, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) throws IllegalAccessException {
         if(!ConfigHandler.replacementActive.getCached()) return;
 
-        Screen screen = Minecraft.getInstance().gui.screen();
-        if(StateStorage.currentlyRenderingUi && screen != null && !WhitelistedScreensUtil.isWhitelisted(screen)) return;
-
         if(renderState instanceof AvatarRenderState playerState) {
 //            System.out.println("aaa");
             if(StateStorage.currentStates.containsKey(playerState)) {

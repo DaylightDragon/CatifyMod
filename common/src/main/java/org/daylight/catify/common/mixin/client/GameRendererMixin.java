@@ -15,6 +15,5 @@ public class GameRendererMixin {
     )
     private void afterRender(CallbackInfo ci) {
         StateStorage.currentStates.clear();
-        StateStorage.currentlyRenderingUi = false;
     }
 }

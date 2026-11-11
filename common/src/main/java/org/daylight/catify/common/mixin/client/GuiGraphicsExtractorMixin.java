@@ -15,6 +15,8 @@ import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.player.Player;
 import org.daylight.catify.common.config.ConfigHandler;
 import org.daylight.catify.common.features.CatChargeFeatureRenderer;
+import org.daylight.catify.common.interfaces.CustomCatTextureHolder;
+import org.daylight.catify.common.util.ModStateUtils;
 import org.daylight.catify.common.util.PlayerToCatReplacer;
 import org.daylight.catify.common.util.StateStorage;
 import org.daylight.catify.common.util.WhitelistedScreensUtil;
@@ -65,7 +67,8 @@ public class GuiGraphicsExtractorMixin {
 
     private EntityRenderState getNewState(EntityRenderState original, int x0, int x1, int y0, int y1) {
         if (!(original instanceof AvatarRenderState playerState)) return original;
-//        System.out.println(((AvatarRenderState) original).bodyRot);
+
+        if (!ConfigHandler.replacementActive.getCached()) return original;
 
         // Проверяем, нужно ли заменить (используя вашу логику StateStorage)
         UUID uuid = StateStorage.inventoryPlayerUUID; // currentStates.get(playerState);
@@ -73,6 +76,8 @@ public class GuiGraphicsExtractorMixin {
 
         Player player = PlayerToCatReplacer.getPlayerById(uuid);
         if (player == null) return original;
+
+        if (!ModStateUtils.shouldRenderCat(player)) return original;
 
         Cat cat = (Cat) PlayerToCatReplacer.getCatForPlayer(player);
         if (cat == null) return original;
@@ -94,6 +99,12 @@ public class GuiGraphicsExtractorMixin {
         catState.lightCoords = playerState.lightCoords;
         if (ConfigHandler.catDamageVisible.getCached()) {
             catState.hasRedOverlay = playerState.hasRedOverlay;
+        }
+
+        if (catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
+            if (customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
+                catRenderer.createRenderState(cat, 0);
+            }
         }
 
         // Обрабатываем специальную логику GUI (например, повороты в инвентаре)
@@ -137,6 +148,8 @@ public class GuiGraphicsExtractorMixin {
         if (ConfigHandler.catDamageVisible.getCached()) {
             catState.hasRedOverlay = playerState.hasRedOverlay;
         }
+
+        catState.displayFireAnimation = original.displayFireAnimation;
 
         // 3. Копируем информацию об освещении
         catState.lightCoords = playerState.lightCoords;
