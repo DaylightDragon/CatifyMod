@@ -8,7 +8,7 @@ import org.daylight.catify.common.features.CatChargeFeatureRenderer;
 import java.util.function.Predicate;
 
 public interface IFeatureManager {
-    boolean catmodel$addFeature(RenderLayer<?, ?> feature);
-    void renderAllFeatures(LivingEntityRenderState livingEntityRenderState, RenderLayer matrixStack, SubmitNodeCollector collector, int i, Predicate<RenderLayer<?, ?>> filter);
+    boolean catmodel$addLayer(RenderLayer<?, ?> feature);
+    void renderAllLayers(LivingEntityRenderState livingEntityRenderState, RenderLayer matrixStack, SubmitNodeCollector collector, int i, Predicate<RenderLayer<?, ?>> filter);
     CatChargeFeatureRenderer catModel$getCatChargeFeatureRenderer();
 }

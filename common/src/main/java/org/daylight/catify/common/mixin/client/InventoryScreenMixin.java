@@ -18,30 +18,4 @@ public class InventoryScreenMixin {
     private static void afterInventoryRender(CallbackInfo ci) {
         TemporaryFlags.CURRENTLY_RENDERING_INVENTORY.clear();
     }
-
-//    @Inject(
-//            method = "extractEntityInInventoryFollowsMouse",
-//            at = @At("RETURN")
-//    )
-//    private static void captureState(
-//            GuiGraphicsExtractor graphics, int x0, int y0, int x1, int y1,
-//            int size, float offsetY, float mouseX, float mouseY,
-//            LivingEntity entity, CallbackInfo ci,
-//            @Local(name = "renderState") EntityRenderState state
-//    ) {
-//        if (state instanceof AvatarRenderState) {
-////            StateStorage.currentStates.put(state, entity.getUUID());
-//            StateStorage.inventoryPlayerUUID = entity.getUUID();
-//        }
-//    }
-
-//    @Inject(method = "extractEntityInInventoryFollowsMouse", at = @At("HEAD"))
-//    public static void beforeExtractEntity(CallbackInfo ci) {
-//        TemporaryFlags.CURRENTLY_EXTRACTING_INVENTORY_PLAYER.set(true);
-//    }
-//
-//    @Inject(method = "extractEntityInInventoryFollowsMouse", at = @At("TAIL"))
-//    public static void afterExtractEntity(CallbackInfo ci) {
-//        TemporaryFlags.CURRENTLY_EXTRACTING_INVENTORY_PLAYER.clear();
-//    }
 }

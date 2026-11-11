@@ -1,10 +1,7 @@
 package org.daylight.catify.common.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.CatRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -17,7 +14,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.daylight.catify.common.Catify;
 import org.daylight.catify.common.interfaces.CustomCatTextureHolder;
 import org.daylight.catify.common.interfaces.IFeatureManager;
@@ -26,11 +22,9 @@ import org.daylight.catify.common.features.CatChargeFeatureRenderer;
 import org.daylight.catify.common.util.ModStateUtils;
 import org.daylight.catify.common.util.PlayerToCatReplacer;
 import org.daylight.catify.common.util.StateStorage;
-import org.daylight.catify.common.util.WhitelistedScreensUtil;
 import org.daylight.catify.common.util.flags.TemporaryFlags;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,17 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.UUID;
 
 @Mixin(EntityRenderDispatcher.class)
-public abstract class EntityRenderManagerMixin {
-//    @Shadow
-//    private boolean renderShadows;
-//    private boolean renderShadows() { return true; } // TODO
-
+public abstract class EntityRenderDispatcherMixin {
     @Shadow
     public abstract <S extends EntityRenderState> EntityRenderer<?, ? super S> getRenderer(S state);
-
-    @Shadow
-    @Final
-    public Options options;
 
     @Inject(
             method = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/client/renderer/state/level/CameraRenderState;DDDLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V",
@@ -61,9 +47,7 @@ public abstract class EntityRenderManagerMixin {
         if(!ConfigHandler.replacementActive.getCached()) return;
 
         if(renderState instanceof AvatarRenderState playerState) {
-//            System.out.println("aaa");
             if(StateStorage.currentStates.containsKey(playerState)) {
-//                System.out.println("bbbb");
                 UUID playerUuid = StateStorage.currentStates.get(playerState);
                 if(playerUuid == null) return;
                 Player player = PlayerToCatReplacer.getPlayerById(playerUuid);
@@ -77,14 +61,11 @@ public abstract class EntityRenderManagerMixin {
                 EntityRenderer<?, ? super S> originalRenderer = this.getRenderer(renderState);
                 float tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
-//                System.out.println("c " + player.getStringUUID());
-//                System.out.println(player.getXRot());
                 ci.cancel();
                 PlayerToCatReplacer.syncEntity2(player, cat);
 
                 catRenderer = (CatRenderer) this.getRenderer(cat);
                 catState = catRenderer.createRenderState(cat, tickDelta);
-//                System.out.println(catState.xRot);
 
                 if(playerState == null) playerState = (AvatarRenderState) getRenderer(player).createRenderState(player, tickDelta);
                 if(ConfigHandler.catDamageVisible.getCached()) catState.hasRedOverlay = playerState.hasRedOverlay;
@@ -102,17 +83,15 @@ public abstract class EntityRenderManagerMixin {
 
                 try {
                     matrices.pushPose();
-                    Vec3 vec3d = originalRenderer.getRenderOffset(renderState);
+//                    Vec3 vec3d = originalRenderer.getRenderOffset(renderState);
                     matrices.translate(x, y, z);
 //                    matrices.translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
                     if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
                         if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
-//                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
                             catRenderer.createRenderState(cat, 0);
                         }
                     }
                     ci.cancel();
-
 
 //                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
 
@@ -168,26 +147,9 @@ public abstract class EntityRenderManagerMixin {
 
 
             }
-//            System.out.println(playerState.entityType == EntityType.PLAYER);
-//            throw new IllegalAccessException("What is calling this help");
-//            playerState.ent
         }
     }
 
-//    @Shadow
-//    private static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, float opacity, WorldView world, float radius) {
-//    }
-//    private static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, float opacity, WorldView world, float radius) { // TODO
-//    }
-
     @Shadow
     public abstract <T extends Entity> EntityRenderer getRenderer(T entity);
-
-//    @Shadow
-//    public abstract boolean shouldRenderHitboxes();
-//    public boolean shouldRenderHitboxes() { return false; }
-
-//    @Shadow
-//    protected abstract void renderHitboxes(MatrixStack matrices, EntityRenderState state, EntityHitboxAndView hitbox, VertexConsumerProvider vertexConsumers);
-//    protected void renderHitboxes(MatrixStack matrices, EntityRenderState state, EntityHitboxAndView hitbox, VertexConsumerProvider vertexConsumers) {}
 }

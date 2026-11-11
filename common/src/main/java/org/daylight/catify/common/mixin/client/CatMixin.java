@@ -11,13 +11,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Cat.class)
-public class CatEntityMixin implements CustomCatTextureHolder {
+public class CatMixin implements CustomCatTextureHolder {
     @Unique
     private Identifier customTexture = null;
     @Unique
     private boolean customTextureUpdateRequired = false;
-//    @Unique
-//    private float catmodel$chargeProgress = 0;
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void cancelTick(CallbackInfo ci) {
@@ -45,14 +43,4 @@ public class CatEntityMixin implements CustomCatTextureHolder {
     public void catModel$requestCustomTextureUpdate() {
         customTextureUpdateRequired = true;
     }
-
-//    @Override
-//    public float catmodel$getChargeProgress() {
-//        return catmodel$chargeProgress;
-//    }
-//
-//    @Override
-//    public void catmodel$setChargeProgress(float value) {
-//        this.catmodel$chargeProgress = value;
-//    }
 }

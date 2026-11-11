@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.UUID;
 
 @Mixin(CatRenderState.class)
-public class CatEntityRenderStateMixin implements CustomCatState {
+public class CatRenderStateMixin implements CustomCatState {
     @Unique
     private boolean catmodel$chargeActive = false;
     @Unique

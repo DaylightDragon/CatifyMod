@@ -34,13 +34,6 @@ import java.util.UUID;
 
 @Mixin(GuiGraphicsExtractor.class)
 public class GuiGraphicsExtractorMixin {
-//    @ModifyVariable(
-//            method = "entity",
-//            at = @At("HEAD"),
-//            argsOnly = true
-//    )
-//    private EntityRenderState replaceWithCatState(EntityRenderState original) {
-
     @Shadow
     @Final
     public GuiRenderState guiRenderState;

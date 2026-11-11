@@ -23,7 +23,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
     protected List<RenderLayer<S, M>> layers;
 
     @Override
-    public boolean catmodel$addFeature(RenderLayer<?, ?> feature) {
+    public boolean catmodel$addLayer(RenderLayer<?, ?> feature) {
         return addLayer((RenderLayer<S, M>) feature);
     }
 

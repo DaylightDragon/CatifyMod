@@ -18,12 +18,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CatRenderer.class)
-public abstract class CatEntityRendererMixin {
+public abstract class CatRendererMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(EntityRendererProvider.Context context, CallbackInfo ci) {
         var feature = new CatChargeFeatureRenderer<>((RenderLayerParent<CatRenderState, AdultCatModel>) this, context.getModelSet(), ModResources.GHOST_TEXTURE);
         if((Object) this instanceof IFeatureManager featureManager) {
-            featureManager.catmodel$addFeature(feature);
+            featureManager.catmodel$addLayer(feature);
         }
     }
 

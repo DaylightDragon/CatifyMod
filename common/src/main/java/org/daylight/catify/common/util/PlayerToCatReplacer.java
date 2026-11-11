@@ -20,7 +20,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.feline.Cat;
@@ -32,14 +31,13 @@ import org.daylight.catify.common.interfaces.CustomCatTextureHolder;
 import org.daylight.catify.common.config.ConfigHandler;
 //import org.daylight.catify.common.mixin.client.CatAccessor;
 import org.daylight.catify.common.config.Data;
-import org.daylight.catify.common.mixin.client.CatEntityAccessor;
-import org.daylight.catify.common.mixin.client.LimbAnimatorAccessor;
+import org.daylight.catify.common.mixin.client.CatAccessor;
+import org.daylight.catify.common.mixin.client.WalkAnimationStateAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -95,7 +93,7 @@ public class PlayerToCatReplacer {
 //                .orElse(null);
 
 //        RegistryAccess.RegistryEntry<CatVariant> variant = getCatVariant(variantKey);
-        ((CatEntityAccessor) cat).invokeSetVariant(variant);
+        ((CatAccessor) cat).catify$invokeSetVariant(variant);
     }
 
     public static void cleanup() {
@@ -177,7 +175,7 @@ public class PlayerToCatReplacer {
 //                1.0f
 //        );
 //
-        if (existingCat.walkAnimation instanceof LimbAnimatorAccessor acc) {
+        if (existingCat.walkAnimation instanceof WalkAnimationStateAccessor acc) {
             acc.caitify$setPosition(player.walkAnimation.position() * 0.1f); // TODO maybe missing partialtick
         }
     }

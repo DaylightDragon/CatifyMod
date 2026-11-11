@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Cat.class)
-public interface CatEntityAccessor {
+public interface CatAccessor {
     @Invoker("setVariant")
-    void invokeSetVariant(Holder<CatVariant> variant);
+    void catify$invokeSetVariant(Holder<CatVariant> variant);
 }
 
